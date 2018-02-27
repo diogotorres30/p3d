@@ -1,0 +1,51 @@
+﻿  main.cpp
+c:\users\tiago\documents\p3d\p3d\p3d\p3d\main.cpp(49): error C2143: syntax error: missing ';' before '*'
+c:\users\tiago\documents\p3d\p3d\p3d\p3d\main.cpp(49): error C4430: missing type specifier - int assumed. Note: C++ does not support default-int
+c:\users\tiago\documents\p3d\p3d\p3d\p3d\main.cpp(59): error C4430: missing type specifier - int assumed. Note: C++ does not support default-int
+c:\users\tiago\documents\p3d\p3d\p3d\p3d\main.cpp(59): error C2146: syntax error: missing ';' before identifier 'rayTracing'
+c:\users\tiago\documents\p3d\p3d\p3d\p3d\main.cpp(60): error C2143: syntax error: missing ';' before '{'
+c:\users\tiago\documents\p3d\p3d\p3d\p3d\main.cpp(60): error C2447: '{': missing function header (old-style formal list?)
+c:\users\tiago\documents\p3d\p3d\p3d\p3d\main.cpp(226): error C2065: 'YOUR': undeclared identifier
+c:\users\tiago\documents\p3d\p3d\p3d\p3d\main.cpp(226): error C2143: syntax error: missing ';' before 'constant'
+c:\users\tiago\documents\p3d\p3d\p3d\p3d\main.cpp(226): error C2146: syntax error: missing ';' before identifier 'FUNTIONS'
+c:\users\tiago\documents\p3d\p3d\p3d\p3d\main.cpp(227): error C2065: 'ray': undeclared identifier
+c:\users\tiago\documents\p3d\p3d\p3d\p3d\main.cpp(227): error C2065: 'calculate': undeclared identifier
+c:\users\tiago\documents\p3d\p3d\p3d\p3d\main.cpp(227): error C2146: syntax error: missing ';' before identifier 'PrimaryRay'
+c:\users\tiago\documents\p3d\p3d\p3d\p3d\main.cpp(227): error C3861: 'PrimaryRay': identifier not found
+c:\users\tiago\documents\p3d\p3d\p3d\p3d\main.cpp(228): error C2065: 'color': undeclared identifier
+c:\users\tiago\documents\p3d\p3d\p3d\p3d\main.cpp(228): error C2065: 'ray': undeclared identifier
+c:\users\tiago\documents\p3d\p3d\p3d\p3d\main.cpp(228): error C3861: 'rayTracing': identifier not found
+c:\users\tiago\documents\p3d\p3d\p3d\p3d\main.cpp(232): error C2065: 'color': undeclared identifier
+c:\users\tiago\documents\p3d\p3d\p3d\p3d\main.cpp(232): error C2228: left of '.r' must have class/struct/union
+  c:\users\tiago\documents\p3d\p3d\p3d\p3d\main.cpp(232): note: type is 'unknown-type'
+c:\users\tiago\documents\p3d\p3d\p3d\p3d\main.cpp(233): error C2065: 'color': undeclared identifier
+c:\users\tiago\documents\p3d\p3d\p3d\p3d\main.cpp(233): error C2228: left of '.g' must have class/struct/union
+  c:\users\tiago\documents\p3d\p3d\p3d\p3d\main.cpp(233): note: type is 'unknown-type'
+c:\users\tiago\documents\p3d\p3d\p3d\p3d\main.cpp(234): error C2065: 'color': undeclared identifier
+c:\users\tiago\documents\p3d\p3d\p3d\p3d\main.cpp(234): error C2228: left of '.b' must have class/struct/union
+  c:\users\tiago\documents\p3d\p3d\p3d\p3d\main.cpp(234): note: type is 'unknown-type'
+c:\users\tiago\documents\p3d\p3d\p3d\p3d\main.cpp(346): error C2065: 'INSERT': undeclared identifier
+c:\users\tiago\documents\p3d\p3d\p3d\p3d\main.cpp(346): error C2146: syntax error: missing ';' before identifier 'HERE'
+c:\users\tiago\documents\p3d\p3d\p3d\p3d\main.cpp(346): error C2065: 'HERE': undeclared identifier
+c:\users\tiago\documents\p3d\p3d\p3d\p3d\main.cpp(346): error C2146: syntax error: missing ';' before identifier 'YOUR'
+c:\users\tiago\documents\p3d\p3d\p3d\p3d\main.cpp(346): error C2065: 'YOUR': undeclared identifier
+c:\users\tiago\documents\p3d\p3d\p3d\p3d\main.cpp(346): error C2146: syntax error: missing ';' before identifier 'CODE'
+c:\users\tiago\documents\p3d\p3d\p3d\p3d\main.cpp(346): error C2065: 'CODE': undeclared identifier
+c:\users\tiago\documents\p3d\p3d\p3d\p3d\main.cpp(346): error C2146: syntax error: missing ';' before identifier 'FOR'
+c:\users\tiago\documents\p3d\p3d\p3d\p3d\main.cpp(346): error C2065: 'FOR': undeclared identifier
+c:\users\tiago\documents\p3d\p3d\p3d\p3d\main.cpp(346): error C2146: syntax error: missing ';' before identifier 'PARSING'
+c:\users\tiago\documents\p3d\p3d\p3d\p3d\main.cpp(346): error C2065: 'PARSING': undeclared identifier
+c:\users\tiago\documents\p3d\p3d\p3d\p3d\main.cpp(346): error C2146: syntax error: missing ';' before identifier 'NFF'
+c:\users\tiago\documents\p3d\p3d\p3d\p3d\main.cpp(346): error C2065: 'NFF': undeclared identifier
+c:\users\tiago\documents\p3d\p3d\p3d\p3d\main.cpp(347): error C2146: syntax error: missing ';' before identifier 'FILES'
+c:\users\tiago\documents\p3d\p3d\p3d\p3d\main.cpp(346): error C2065: 'FILES': undeclared identifier
+c:\users\tiago\documents\p3d\p3d\p3d\p3d\main.cpp(347): error C2146: syntax error: missing ';' before identifier 'scene'
+c:\users\tiago\documents\p3d\p3d\p3d\p3d\main.cpp(347): error C2061: syntax error: identifier 'Scene'
+c:\users\tiago\documents\p3d\p3d\p3d\p3d\main.cpp(348): error C2227: left of '->load_nff' must point to class/struct/union/generic type
+  c:\users\tiago\documents\p3d\p3d\p3d\p3d\main.cpp(348): note: type is 'int *'
+c:\users\tiago\documents\p3d\p3d\p3d\p3d\main.cpp(349): error C2227: left of '->GetCamera' must point to class/struct/union/generic type
+  c:\users\tiago\documents\p3d\p3d\p3d\p3d\main.cpp(349): note: type is 'int *'
+c:\users\tiago\documents\p3d\p3d\p3d\p3d\main.cpp(349): error C2227: left of '->GetResX' must point to class/struct/union/generic type
+c:\users\tiago\documents\p3d\p3d\p3d\p3d\main.cpp(350): error C2227: left of '->GetCamera' must point to class/struct/union/generic type
+  c:\users\tiago\documents\p3d\p3d\p3d\p3d\main.cpp(350): note: type is 'int *'
+c:\users\tiago\documents\p3d\p3d\p3d\p3d\main.cpp(350): error C2227: left of '->GetResY' must point to class/struct/union/generic type
