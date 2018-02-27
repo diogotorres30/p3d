@@ -1,7 +1,7 @@
  ///////////////////////////////////////////////////////////////////////
 //
 // P3D Course
-// (c) 2016 by JoÃ£o Madeiras Pereira
+// (c) 2016 by João Madeiras Pereira
 // TEMPLATE: Whitted Ray Tracing NFF scenes and drawing points with Modern OpenGL
 //
 //You should develop your rayTracing( Ray ray, int depth, float RefrIndex) which returns a color and
@@ -16,9 +16,13 @@
 #include <stdio.h>
 
 #include <GL/glew.h>
+#ifdef _APPLE_
+#include <GLUT/glut.h>
+#else
 #include <GL/freeglut.h>
+#endif
 
-#include "scene.h"
+//#include "scene.h"
 
 #define CAPTION "ray tracer"
 
@@ -153,8 +157,8 @@ void createBufferObjects()
 	glGenBuffers(2, VboId);
 	glBindBuffer(GL_ARRAY_BUFFER, VboId[0]);
 
-	/* NÃ£o Ã© necessÃ¡rio fazer glBufferData, ou seja o envio dos pontos para a placa grÃ¡fica pois isso 
-	Ã© feito na drawPoints em tempo de execuÃ§Ã£o com GL_DYNAMIC_DRAW */
+	/* Não é necessário fazer glBufferData, ou seja o envio dos pontos para a placa gráfica pois isso 
+	é feito na drawPoints em tempo de execução com GL_DYNAMIC_DRAW */
 
 	glEnableVertexAttribArray(VERTEX_COORD_ATTRIB);
 	glVertexAttribPointer(VERTEX_COORD_ATTRIB, 2, GL_FLOAT, 0, 0, 0);
@@ -229,21 +233,21 @@ void renderScene()
 			colors[index_col++]= (float)color.g;
 			colors[index_col++]= (float)color.b;	
 
-			if(draw_mode == 0) {  // desenhar o conteÃºdo da janela ponto a ponto
+			if(draw_mode == 0) {  // desenhar o conteúdo da janela ponto a ponto
 				drawPoints();
 				index_pos=0;
 				index_col=0;
 			}
 		}
 		printf("line %d", y);
-		if(draw_mode == 1) {  // desenhar o conteÃºdo da janela linha a linha
+		if(draw_mode == 1) {  // desenhar o conteúdo da janela linha a linha
 				drawPoints();
 				index_pos=0;
 				index_col=0;
 		}
 	}
 
-	if(draw_mode == 2) //preenchar o conteÃºdo da janela com uma imagem completa
+	if(draw_mode == 2) //preenchar o conteúdo da janela com uma imagem completa
 		 drawPoints();
 
 	printf("Terminou!\n"); 	
@@ -345,17 +349,17 @@ int main(int argc, char* argv[])
 	RES_X = scene->GetCamera()->GetResX();
 	RES_Y = scene->GetCamera()->GetResY();
 
-	if(draw_mode == 0) { // desenhar o conteÃºdo da janela ponto a ponto
+	if(draw_mode == 0) { // desenhar o conteúdo da janela ponto a ponto
 		size_vertices = 2*sizeof(float);
 		size_colors = 3*sizeof(float);
 		printf("DRAWING MODE: POINT BY POINT\n");
 	}
-	else if(draw_mode == 1) { // desenhar o conteÃºdo da janela linha a linha
+	else if(draw_mode == 1) { // desenhar o conteúdo da janela linha a linha
 		size_vertices = 2*RES_X*sizeof(float);
 		size_colors = 3*RES_X*sizeof(float);
 		printf("DRAWING MODE: LINE BY LINE\n");
 	}
-	else if(draw_mode == 2) { // preencher o conteÃºdo da janela com uma imagem completa
+	else if(draw_mode == 2) { // preencher o conteúdo da janela com uma imagem completa
 		size_vertices = 2*RES_X*RES_Y*sizeof(float);
 		size_colors = 3*RES_X*RES_Y*sizeof(float);
 		printf("DRAWING MODE: FULL IMAGE\n");
