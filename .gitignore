@@ -18,4 +18,4 @@ bin/x64/*.pdb
 # Mac Artifacts
 *.DS_Store
 
-P3D_Project.xcodeproj/
+RayTracing/TurnerRayTracing/src/P3D_Project.xcodeproj/
