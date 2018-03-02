@@ -22,7 +22,7 @@
 #include <GL/freeglut.h>
 #endif
 
-//#include "scene.h"
+#include "Scene.h"
 
 #define CAPTION "ray tracer"
 
@@ -46,7 +46,7 @@ GLuint VboId[2];
 GLuint VertexShaderId, FragmentShaderId, ProgramId;
 GLint UniformId;
 
-//Scene* scene = NULL;
+Scene* scene = NULL;
 int RES_X, RES_Y;
 
 /* Draw Mode: 0 - point by point; 1 - line by line; 2 - full frame */
