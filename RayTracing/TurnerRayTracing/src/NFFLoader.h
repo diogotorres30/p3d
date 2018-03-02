@@ -1,11 +1,35 @@
 #ifndef __NFFLOADER_H__
 #define __NFFLOADER_H__
 
+#include <iostream>
+#include <sstream>
+#include <fstream>
+#include <string>
+
 class NFFLoader
 {
 	private:
-
+		
 	public:
+		virtual ~NFFLoader();
+		void parseLine(std::stringstream& sin);
+		void parseViewing(std::stringstream& sin);
+
+		void parseCone(std::stringstream& sin);
+		void parseCone(std::stringstream& sin);
+		void parseCone(std::stringstream& sin);
+		void parseCone(std::stringstream& sin);
+		void parseCone(std::stringstream& sin);
+		void parseCone(std::stringstream& sin);
+		void parseCone(std::stringstream& sin);
+
+		void parseBackground(std::stringstream& sin);
+		void parseLight(std::stringstream& sin);
+		void parseMaterial(std::stringstream& sin);
+		void parseCone(std::stringstream& sin);
+		void parseSphere(std::stringstream& sin);
+		void parsePolygon(std::stringstream& sin);
+		void parsePolygonalPatch(std::stringstream& sin);
 };
 
 #endif // !__NFFLOADER_H__
