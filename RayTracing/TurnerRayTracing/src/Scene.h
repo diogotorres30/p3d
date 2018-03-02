@@ -11,7 +11,9 @@ class Scene
 
 	public:
 		Scene();
-		Scene();
+		~Scene();
+		Camera GetCamera();
+		void setCamera(Camera cam);
 };
 
 #endif // !__SCENE_H__
