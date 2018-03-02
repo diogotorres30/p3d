@@ -328,7 +328,7 @@ void setupGLUT(int argc, char* argv[])
     
     
     glutInitDisplayMode(GLUT_SINGLE | GLUT_RGBA);
-    //glDisable(GL_DEPTH_TEST);
+    glDisable(GL_DEPTH_TEST);
     WindowHandle = glutCreateWindow(CAPTION);
     if(WindowHandle < 1) {
         std::cerr << "ERROR: Could not create a new rendering window." << std::endl;

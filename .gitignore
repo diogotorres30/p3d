@@ -19,3 +19,4 @@ bin/x64/*.pdb
 *.DS_Store
 
 RayTracing/TurnerRayTracing/src/P3D_Project.xcodeproj/
+/RayTracing/TurnerRayTracing/src/NFFParser.cpp

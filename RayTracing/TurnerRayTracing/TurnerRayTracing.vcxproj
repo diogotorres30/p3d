@@ -151,6 +151,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\MathAux.cpp" />
+    <ClCompile Include="src\NFFLoader.cpp" />
+    <ClCompile Include="src\NFFParser.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\MathAux.h" />
+    <ClInclude Include="src\NFFLoader.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
