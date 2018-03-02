@@ -6,21 +6,18 @@
 class Camera
 {
 	private:
-		Vector3 position, lookAt, direction, up;
-		Vector3 invposition, invlookAt, invdirection, invup;
+		Vector3 from, at, up;
+		float angle, hither;
+		int resX, resY;
 		float fovy, aspect, zNear, zFar, speed;
 		Matrix4 projection, orthographic, perspective;
-		Matrix4 viewMatrix, invviewMatrix;
-		bool updatebool;
-		int timeamount = 0;
-		const int maxtime = 150;
-		int RES_X, RES_Y;
+		Matrix4 viewMatrix;
 
 	public:
-		Camera();
+		Camera(Vector3 nFrom, Vector3 nAt, Vector3 nUp, float nAngle, float nHither, int nResX, int nResY);
 		~Camera();
-		int GetResX() { return RES_X; };
-		int GetResY() { return RES_Y; };
+		int GetResX() { return resX; };
+		int GetResY() { return resY; };
 };
 
 #endif // !__CAMERA_H__
