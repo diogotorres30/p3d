@@ -23,6 +23,8 @@
 #endif
 
 #include "Scene.h"
+#include "Color.h"
+#include "Ray.h"
 
 #define CAPTION "ray tracer"
 
@@ -56,10 +58,22 @@ int WindowHandle = 0;
 
 ///////////////////////////////////////////////////////////////////////  RAY-TRACE SCENE
 
-//Color rayTracing( Ray ray, int depth, float RefrIndex)
-//{
-//    INSERT HERE YOUR CODE
-//}
+Color rayTracing( Ray ray, int depth, float RefrIndex)
+{
+/*
+	For each pixel in the viewport;
+	shoot a ray;
+	for each object in the scene
+	compute intersection ray-object;
+	store the closest intersection;
+	if there is an intersection
+	shade the pixel using color, lights, materials;
+	else  "ray misses all objects"
+	shade the pixel with background color
+*/
+
+	return Color();
+}
 
 /////////////////////////////////////////////////////////////////////// ERRORS
 
@@ -224,15 +238,18 @@ void renderScene()
         {
             
             //YOUR 2 FUNTIONS:
-            //ray = calculate PrimaryRay(x, y);
-            //color=rayTracing(ray, 1, 1.0 );
+            //Ray ray = Ray(scene->getCamera()->getFrom(),Vector2(x, y));
+            //Color color = rayTracing(ray, 1, 1.0 );
             
+			//test with a red screen
+			Color color = Color(1.0f, 0.0f, 0.0f);
+
             vertices[index_pos++]= (float)x;
             vertices[index_pos++]= (float)y;
-            //colors[index_col++]= (float)color.r;
-            //colors[index_col++]= (float)color.g;
-            //colors[index_col++]= (float)color.b;
-            
+            colors[index_col++]= (float)color.r;
+            colors[index_col++]= (float)color.g;
+            colors[index_col++]= (float)color.b;
+          
             if(draw_mode == 0) {  // desenhar o conte˙do da janela ponto a ponto
                 drawPoints();
                 index_pos=0;
@@ -354,6 +371,7 @@ int main(int argc, char* argv[])
     //if(!(scene->load_nff("jap.nff"))) return 0;
     //RES_X = scene->GetCamera()->GetResX();
     //RES_Y = scene->GetCamera()->GetResY();
+	RES_X = RES_Y = 512;
     
     if(draw_mode == 0) { // desenhar o conte˙do da janela ponto a ponto
         size_vertices = 2*sizeof(float);
