@@ -311,7 +311,10 @@ void reshape(int w, int h)
 /////////////////////////////////////////////////////////////////////// SETUP
 void setupCallbacks()
 {
-    //glutCloseFunc(cleanup);
+    #ifdef __APPLE__
+    #else
+        glutCloseFunc(cleanup);
+    #endif
     glutDisplayFunc(renderScene);
     glutReshapeFunc(reshape);
 }
@@ -335,20 +338,21 @@ void setupGLUT(int argc, char* argv[])
     glutInit(&argc, argv);
     
     #ifdef __APPLE__
-        glutInitDisplayMode(GLUT_3_2_CORE_PROFILE | GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA | GLUT_MULTISAMPLE);
+        glutInitDisplayMode(GLUT_3_2_CORE_PROFILE | GLUT_SINGLE | GLUT_RGBA | GLUT_DEPTH);
     #else
         glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA | GLUT_MULTISAMPLE);
         glutInitContextVersion(3, 3);
         glutInitContextProfile(GLUT_CORE_PROFILE );
         glutInitContextFlags(GLUT_FORWARD_COMPATIBLE | GLUT_DEBUG);
         glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_GLUTMAINLOOP_RETURNS);
+        glutInitDisplayMode(GLUT_SINGLE | GLUT_RGBA);
     #endif
     
     glutInitWindowPosition(640,100);
     glutInitWindowSize(RES_X, RES_Y);
     
     
-    glutInitDisplayMode(GLUT_SINGLE | GLUT_RGBA);
+    
     #ifdef __APPLE__
     #else
     glDisable(GL_DEPTH_TEST);
@@ -378,9 +382,7 @@ int main(int argc, char* argv[])
     //if(!(scene->load_nff("jap.nff"))) return 0;
     //RES_X = scene->GetCamera()->GetResX();
     //RES_Y = scene->GetCamera()->GetResY();
-	//RES_X = RES_Y = 512;
-    RES_X = 512;
-    RES_Y = 512;
+	RES_X = RES_Y = 512;
     
     if(draw_mode == 0) { // desenhar o conte˙do da janela ponto a ponto
         size_vertices = 2*sizeof(float);
