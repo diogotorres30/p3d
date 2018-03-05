@@ -17,7 +17,7 @@ void Scene::setCamera(Camera *cam)
 
 int Scene::load_nff(std::string& filename)
 {
-	NFFLoader loader = NFFLoader();
+	//NFFLoader loader = NFFLoader();
 
 	//TODO: missing NFFLoader implementation
 

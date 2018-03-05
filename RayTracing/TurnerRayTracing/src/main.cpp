@@ -24,6 +24,7 @@
 
 #include "Scene.h"
 #include "Color.h"
+#include "Ray.h"
 
 #define CAPTION "ray tracer"
 
@@ -57,8 +58,8 @@ int WindowHandle = 0;
 
 ///////////////////////////////////////////////////////////////////////  RAY-TRACE SCENE
 
-//Color rayTracing( Ray ray, int depth, float RefrIndex)
-//{
+Color rayTracing( Ray ray, int depth, float RefrIndex)
+{
 /*
 	For each pixel in the viewport;
 	shoot a ray;
@@ -70,7 +71,9 @@ int WindowHandle = 0;
 	else  "ray misses all objects"
 	shade the pixel with background color
 */
-//}
+
+	return Color();
+}
 
 /////////////////////////////////////////////////////////////////////// ERRORS
 
@@ -235,17 +238,17 @@ void renderScene()
         {
             
             //YOUR 2 FUNTIONS:
-            //ray = calculate PrimaryRay(x, y);
-            //color=rayTracing(ray, 1, 1.0 );
+            //Ray ray = Ray(scene->getCamera()->getFrom(),Vector2(x, y));
+            //Color color = rayTracing(ray, 1, 1.0 );
             
 			//test with a red screen
-			//Color color = Color(1.0f, 0.0f, 0.0f);
+			Color color = Color(1.0f, 0.0f, 0.0f);
 
             vertices[index_pos++]= (float)x;
             vertices[index_pos++]= (float)y;
-            //colors[index_col++]= (float)color.r;
-            //colors[index_col++]= (float)color.g;
-            //colors[index_col++]= (float)color.b;
+            colors[index_col++]= (float)color.r;
+            colors[index_col++]= (float)color.g;
+            colors[index_col++]= (float)color.b;
           
             if(draw_mode == 0) {  // desenhar o conte˙do da janela ponto a ponto
                 drawPoints();

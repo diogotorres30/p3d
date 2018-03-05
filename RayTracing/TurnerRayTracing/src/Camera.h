@@ -16,8 +16,9 @@ class Camera
 	public:
 		Camera(Vector3 nFrom, Vector3 nAt, Vector3 nUp, float nAngle, float nHither, int nResX, int nResY);
 		~Camera();
-		int GetResX() { return resX; };
-		int GetResY() { return resY; };
+		Vector3 getFrom() { return from; };
+		int getResX() { return resX; };
+		int getResY() { return resY; };
 };
 
 #endif // !__CAMERA_H__
