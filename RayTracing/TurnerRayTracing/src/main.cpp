@@ -49,7 +49,8 @@ GLuint VertexShaderId, FragmentShaderId, ProgramId;
 GLint UniformId;
 
 Scene* scene = NULL;
-int RES_X, RES_Y;
+int RES_X;
+int RES_Y;
 
 /* Draw Mode: 0 - point by point; 1 - line by line; 2 - full frame */
 int draw_mode=1;
@@ -161,7 +162,7 @@ void destroyShaderProgram()
     glDeleteShader(VertexShaderId);
     glDeleteProgram(ProgramId);
     
-    //checkOpenGLError("ERROR: Could not destroy shaders.");
+    checkOpenGLError("ERROR: Could not destroy shaders.");
 }
 /////////////////////////////////////////////////////////////////////// VAOs & VBOs
 void createBufferObjects()
@@ -220,7 +221,10 @@ void drawPoints()
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     
-    checkOpenGLError("ERROR: Could not draw scene.");
+    #ifdef __APPLE__
+    #else
+       checkOpenGLError("ERROR: Could not draw scene.");
+    #endif
 }
 
 /////////////////////////////////////////////////////////////////////// CALLBACKS
@@ -330,22 +334,25 @@ void setupGLUT(int argc, char* argv[])
 {
     glutInit(&argc, argv);
     
-#ifdef __APPLE__
-    glutInitDisplayMode(GLUT_3_2_CORE_PROFILE | GLUT_DEPTH | GLUT_SINGLE | GLUT_RGBA);
-#else
-    glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA | GLUT_MULTISAMPLE);
-    glutInitContextVersion(3, 3);
-    glutInitContextProfile(GLUT_CORE_PROFILE );
-    glutInitContextFlags(GLUT_FORWARD_COMPATIBLE | GLUT_DEBUG);
-    glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_GLUTMAINLOOP_RETURNS);
-#endif
+    #ifdef __APPLE__
+        glutInitDisplayMode(GLUT_3_2_CORE_PROFILE | GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA | GLUT_MULTISAMPLE);
+    #else
+        glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA | GLUT_MULTISAMPLE);
+        glutInitContextVersion(3, 3);
+        glutInitContextProfile(GLUT_CORE_PROFILE );
+        glutInitContextFlags(GLUT_FORWARD_COMPATIBLE | GLUT_DEBUG);
+        glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_GLUTMAINLOOP_RETURNS);
+    #endif
     
     glutInitWindowPosition(640,100);
     glutInitWindowSize(RES_X, RES_Y);
     
     
     glutInitDisplayMode(GLUT_SINGLE | GLUT_RGBA);
+    #ifdef __APPLE__
+    #else
     glDisable(GL_DEPTH_TEST);
+    #endif
     WindowHandle = glutCreateWindow(CAPTION);
     if(WindowHandle < 1) {
         std::cerr << "ERROR: Could not create a new rendering window." << std::endl;
@@ -371,7 +378,9 @@ int main(int argc, char* argv[])
     //if(!(scene->load_nff("jap.nff"))) return 0;
     //RES_X = scene->GetCamera()->GetResX();
     //RES_Y = scene->GetCamera()->GetResY();
-	RES_X = RES_Y = 512;
+	//RES_X = RES_Y = 512;
+    RES_X = 512;
+    RES_Y = 512;
     
     if(draw_mode == 0) { // desenhar o conte˙do da janela ponto a ponto
         size_vertices = 2*sizeof(float);
