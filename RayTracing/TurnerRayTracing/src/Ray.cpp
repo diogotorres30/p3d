@@ -1,9 +1,6 @@
 #include "Ray.h"
 
-Ray::Ray()
-{
-
-}
+Ray::Ray(){}
 
 Ray::Ray(Vector3 org, Vector2 pt)
 {
@@ -13,7 +10,13 @@ Ray::Ray(Vector3 org, Vector2 pt)
 	scalar = 0;
 }
 
-Ray::~Ray()
-{
+Ray::~Ray(){}
 
+
+float Ray::ray_sphere(Mesh *mesh)
+{
+    
+    
+    return 0.0;
+    
 }

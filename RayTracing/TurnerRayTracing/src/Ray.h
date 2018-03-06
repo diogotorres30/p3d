@@ -2,7 +2,7 @@
 #define __RAY_H__
 
 #include "MathAux.h"
-//#include "Mesh.h"
+#include "Mesh.h"
 
 class Ray
 {
@@ -13,7 +13,8 @@ class Ray
 		Ray();
 		Ray(Vector3 org, Vector2 pt);
 		~Ray();
-		//float intersect(Mesh *mesh);
+		float ray_sphere(Mesh *mesh);
+    
 };
 
 
