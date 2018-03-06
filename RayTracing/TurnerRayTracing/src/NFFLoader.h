@@ -31,7 +31,7 @@ class NFFLoader
 		NFFLoader();
 		~NFFLoader() {};
 		void parseLine(std::string sin);
-		//Scene *createScene(std::string &filename);
+		Scene *createScene(std::string &filename);
 		
 		void parseViewing(std::string &sin);
 		void parseFrom(std::string sin);
