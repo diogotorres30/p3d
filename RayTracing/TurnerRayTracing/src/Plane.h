@@ -12,7 +12,7 @@ class Plane : public Mesh
     
     public:
         Plane();
-        Plane(Vector3 newp1, Vector3 newp2, Vector3 newp3);
+        Plane(Vector3 newp1, Vector3 newp2, Vector3 newp3, Material *mat);
     
 };
 

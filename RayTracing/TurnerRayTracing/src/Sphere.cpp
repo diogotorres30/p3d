@@ -2,7 +2,7 @@
 
 Sphere::Sphere(){}
 
-Sphere::Sphere(Vector3 &newcenter, float newradius)
+Sphere::Sphere(Vector3 &newcenter, float newradius, Material *mat) : Mesh(mat)
 {
     center = newcenter;
     radius = newradius;

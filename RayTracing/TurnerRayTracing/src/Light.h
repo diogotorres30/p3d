@@ -1,22 +1,21 @@
 #ifndef __LIGHT_H__
 #define __LIGHT_H__
 
-#include "MathAux.h" 
+#include "MathAux.h"
+#include "Color.h"
 
 class Light
 {
 	protected:
-		Vector3 ambient;
-		Vector3 diffuse;
-		Vector3 specular;
+		Vector3 position;
+		Color color;
 
 	public:
 		Light() {};
-		Light(Vector3 amb, Vector3 diff, Vector3 spec);
+		Light(Vector3 pos, Color col);
 		~Light() {};
-		Vector3 getAmbient() { return ambient; };
-		Vector3 getDiffuse() { return diffuse; };
-		Vector3 getSpecular() { return specular; };
+		Vector3 getPosition() { return position; };
+		Color getColor() { return color; };
 };
 
 #endif // !__LIGHT_H__
