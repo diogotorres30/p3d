@@ -11,7 +11,7 @@ class Sphere : public Mesh
     
     public:
         Sphere();
-        Sphere(Vector3 &newcenter, float radius);
+        Sphere(Vector3 &newcenter, float radius, Material *mat);
     
 };
 
