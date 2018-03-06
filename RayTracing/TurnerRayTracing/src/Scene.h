@@ -12,9 +12,10 @@
 class Scene
 {
 	private:
-		Camera *camera = NULL;
+		Camera *camera;
 		std::vector<Mesh*> meshes;
 		std::vector<Material*> materials;
+		std::vector<Light*> lights;
 		Color background;
 
 	public:
@@ -22,7 +23,7 @@ class Scene
 		~Scene();
 		Camera *getCamera() { return camera; };
 		void setCamera(Camera *cam);
-		void addMesh(Mesh *mesh, Material *material);
+		void addMesh(Mesh *mesh);
 		void addMaterial(Material *material);
 		void addBackground(const Color &color);
 		void addCamera(Camera *cam);
