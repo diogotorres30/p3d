@@ -5,31 +5,38 @@
 #include <sstream>
 #include <fstream>
 #include <string>
+#include <sstream>
+#include <iostream>
+#include <iterator>
+#include <stdio.h>
+#include <vector>
 
 class NFFLoader
 {
+
 	private:
 		
 	public:
+		NFFLoader();
 		virtual ~NFFLoader();
-		void parseLine(std::stringstream& sin);
-		void parseViewing(std::stringstream& sin);
-
-		void parseCone(std::stringstream& sin);
-		void parseCone(std::stringstream& sin);
-		void parseCone(std::stringstream& sin);
-		void parseCone(std::stringstream& sin);
-		void parseCone(std::stringstream& sin);
-		void parseCone(std::stringstream& sin);
-		void parseCone(std::stringstream& sin);
-
-		void parseBackground(std::stringstream& sin);
-		void parseLight(std::stringstream& sin);
-		void parseMaterial(std::stringstream& sin);
-		void parseCone(std::stringstream& sin);
-		void parseSphere(std::stringstream& sin);
-		void parsePolygon(std::stringstream& sin);
-		void parsePolygonalPatch(std::stringstream& sin);
+		void parseLine(std::string sin);
+		
+		void parseViewing(std::string sin);
+		void parseFrom(std::string sin);
+		void parseAt(std::string sin);
+		void parseUp(std::string sin);
+		void parseAngle(std::string sin);
+		void parseHither(std::string sin);
+		void parseResolution(std::string sin);
+		
+		void parseBackground(std::string sin);
+		void parseLight(std::string sin);
+		void parseMaterial(std::string sin);
+		void parseCone(std::string sin);
+		void parseSphere(std::string sin);
+		void parsePolygon(std::string sin);
+		void parsePolygonalPatch(std::string sin);
+		void parsePlane(std::string sin);
 };
 
 #endif // !__NFFLOADER_H__
