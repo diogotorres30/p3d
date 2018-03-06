@@ -1,5 +1,15 @@
 #include "Camera.h"
 
+Camera::Camera(Vector3 nFrom, Vector3 nAt, Vector3 nUp, float nAngle, float nHither, int nResX, int nResY)
+{
+	from = nFrom;
+	at = nAt;
+	up = nUp;
+	angle = nAngle;
+	hither = nHither;
+	resX = nResX;
+	resY = nResY;
+}
 
 Camera::~Camera()
 {

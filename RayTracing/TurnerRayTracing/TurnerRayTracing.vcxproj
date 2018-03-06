@@ -154,12 +154,15 @@
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\MathAux.cpp" />
     <ClCompile Include="src\NFFLoader.cpp" />
+    <ClCompile Include="src\Ray.cpp" />
     <ClCompile Include="src\Scene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Camera.h" />
+    <ClInclude Include="src\Color.h" />
     <ClInclude Include="src\MathAux.h" />
     <ClInclude Include="src\NFFLoader.h" />
+    <ClInclude Include="src\Ray.h" />
     <ClInclude Include="src\Scene.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
