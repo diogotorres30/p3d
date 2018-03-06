@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <iostream>
 #include <sstream>
+#include <fstream>
 #include <string>
 #include <stdio.h>
 
@@ -22,6 +23,7 @@
 #include <GL/freeglut.h>
 #endif
 
+#include "NFFLoader.h"
 #include "Scene.h"
 #include "Color.h"
 #include "Ray.h"
@@ -378,8 +380,13 @@ void init(int argc, char* argv[])
 int main(int argc, char* argv[])
 {
     //INSERT HERE YOUR CODE FOR PARSING NFF FILES
-    //scene = new Scene();
-    //if(!(scene->load_nff("jap.nff"))) return 0;
+	NFFLoader loader = NFFLoader();
+	std::string filename = std::string("test_scene.nff");
+	scene = loader.createScene(filename);
+
+ //   scene = new Scene();
+	//std::string filename = std::string("jap.nff");
+ //   if(!(scene->load_nff(filename))) return 0;
     //RES_X = scene->GetCamera()->GetResX();
     //RES_Y = scene->GetCamera()->GetResY();
 	RES_X = RES_Y = 512;

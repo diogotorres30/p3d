@@ -14,8 +14,14 @@ class Camera
 		Matrix4 viewMatrix;
 
 	public:
-		Camera(Vector3 nFrom, Vector3 nAt, Vector3 nUp, float nAngle, float nHither, int nResX, int nResY);
+		Camera();
 		~Camera();
+		void setFrom(Vector3 f);
+		void setAt(Vector3 a);
+		void setUp(Vector3 u);
+		void setAngle(float ang);
+		void setHither(float hit);
+		void setResolution(float x, float y);
 		Vector3 getFrom() { return from; };
 		int getResX() { return resX; };
 		int getResY() { return resY; };

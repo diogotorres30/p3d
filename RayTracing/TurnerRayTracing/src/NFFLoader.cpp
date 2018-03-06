@@ -1,13 +1,28 @@
 #include "NFFLoader.h"
 
-NFFLoader::NFFLoader() 
+NFFLoader::NFFLoader()
 {
+	scene = NULL;
+	material = NULL;
+	camera = NULL;
+}
+
+Scene *NFFLoader::createScene(std::string &filename)
+{
+	scene = new Scene();
+
 	std::string sin;
-	std::ifstream nff_input("nff_input.nff");
-	for (std::string line; std::getline(nff_input, line);) 
+	std::ifstream nff_input(filename);
+	for (std::string line; std::getline(nff_input, line);)
 	{
 		sin = line.substr(0, line.find(" "));
-		if (line.compare("v") == 0) parseViewing(sin);
+		if (line.compare("v") == 0) parseViewing(line);
+		else if (sin.compare("from") == 0) parseFrom(line);
+		else if (sin.compare("at") == 0) parseAt(line);
+		else if (sin.compare("up") == 0) parseUp(line);
+		else if (sin.compare("angle") == 0) parseAngle(line);
+		else if (sin.compare("hither") == 0) parseHither(line);
+		else if (sin.compare("resolution") == 0) parseResolution(line);
 		else if (sin.compare("b") == 0) parseBackground(line);
 		else if (sin.compare("l") == 0) parseLight(line);
 		else if (sin.compare("f") == 0) parseMaterial(line);
@@ -16,15 +31,20 @@ NFFLoader::NFFLoader()
 		else if (sin.compare("p") == 0) parsePolygon(line);
 		else if (sin.compare("pp") == 0) parsePolygonalPatch(line);
 		else if (sin.compare("pl") == 0) parsePlane(line);
+
 	}
 }
 
-void NFFLoader::parseViewing(std::string s) 
+void NFFLoader::parseViewing(std::string &sin)
 {
-	std::istringstream iss(s);
-	std::vector<std::string> results((std::istream_iterator<std::string>(iss)), std::istream_iterator<std::string>());
+	camera = new Camera();
+
+	/*std::istringstream iss(s);
+	std::vector<std::string> results((std::istream_iterator<std::string>(iss)), std::istream_iterator<std::string>());*/
 
 	//Depois e chamar a respectiva utilizando as posicoes correctas do vector 'results' criado acima
+
+
 }
 
 void NFFLoader::parseFrom(std::string s)
@@ -57,34 +77,53 @@ void NFFLoader::parseBackground(std::string s)
 	std::istringstream iss(s);
 	std::vector<std::string> results((std::istream_iterator<std::string>(iss)), std::istream_iterator<std::string>());
 
+	//create color with the given values and add it to the scene
+	/*Color c = new Color();
+	scene->addBackground(c);*/
 }
 
 void NFFLoader::parseLight(std::string s)
 {
+	//create light and add it to the scene
+	//Light *light = new Light();
+	//scene->addLight(light);
 }
 
 void NFFLoader::parseMaterial(std::string s)
 {
+	//create material with the given values, add it to the scene and store in a variable to use in the creation of new meshs
+	//Material *mat = new Material();
+	//material = mat;
+	//scene->addMaterial(mat);
 }
 
 void NFFLoader::parseCone(std::string s)
 {
+	//Do later if needed
 }
 
 void NFFLoader::parseSphere(std::string s)
 {
+	//create sphere and add it to the scene as a mesh with the appropriate material
+	//Sphere *sphere = new Sphere();
+	//scene->addMesh(sphere, material);
 }
 
 void NFFLoader::parsePolygon(std::string s)
 {
+	//Do later if needed
 }
 
 void NFFLoader::parsePolygonalPatch(std::string s)
 {
+	//Do later if needed
 }
 
 void NFFLoader::parsePlane(std::string s)
 {
+	//create plane and add it to the scene as a mesh with the appropriate material
+	//Plane *plane = new Plane();
+	//scene->addMesh(plane, material);
 }
 
 

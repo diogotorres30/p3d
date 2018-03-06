@@ -15,11 +15,22 @@ void Scene::setCamera(Camera *cam)
 	camera = cam;
 }
 
-int Scene::load_nff(std::string& filename)
+void addMesh(Mesh *mesh)
 {
-	//NFFLoader loader = NFFLoader();
 
-	//TODO: missing NFFLoader implementation
+}
 
-	return 0;
+void addMaterial(Material *material)
+{
+
+}
+
+void addBackground(const Color &color)
+{
+
+}
+
+void addCamera(Camera *cam)
+{
+
 }

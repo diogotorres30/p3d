@@ -11,17 +11,28 @@
 #include <stdio.h>
 #include <vector>
 
+#include "Scene.h"
+#include "Mesh.h"
+#include "Sphere.h"
+#include "Plane.h"
+#include "Light.h"
+#include "Camera.h"
+
 class NFFLoader
 {
 
 	private:
-		
+		Scene *scene;
+		Material *material;
+		Camera *camera;
+
 	public:
 		NFFLoader();
-		virtual ~NFFLoader();
+		~NFFLoader() {};
 		void parseLine(std::string sin);
+		Scene *createScene(std::string &filename);
 		
-		void parseViewing(std::string sin);
+		void parseViewing(std::string &sin);
 		void parseFrom(std::string sin);
 		void parseAt(std::string sin);
 		void parseUp(std::string sin);
