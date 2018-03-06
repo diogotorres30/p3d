@@ -8,11 +8,6 @@ Scene::Scene()
     std::vector<Light*> lights = std::vector<Light*>();
 }
 
-Scene::~Scene()
-{
-    
-}
-
 void Scene::setCamera(Camera *cam)
 {
     camera = cam;
