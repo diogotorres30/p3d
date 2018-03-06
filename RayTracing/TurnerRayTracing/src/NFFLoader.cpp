@@ -2,38 +2,39 @@
 
 NFFLoader::NFFLoader()
 {
-	scene = NULL;
+	//scene = NULL;
 	material = NULL;
 	camera = NULL;
 }
 
-Scene *NFFLoader::createScene(std::string &filename)
-{
-	scene = new Scene();
-
-	std::string sin;
-	std::ifstream nff_input(filename);
-	for (std::string line; std::getline(nff_input, line);)
-	{
-		sin = line.substr(0, line.find(" "));
-		if (line.compare("v") == 0) parseViewing(line);
-		else if (sin.compare("from") == 0) parseFrom(line);
-		else if (sin.compare("at") == 0) parseAt(line);
-		else if (sin.compare("up") == 0) parseUp(line);
-		else if (sin.compare("angle") == 0) parseAngle(line);
-		else if (sin.compare("hither") == 0) parseHither(line);
-		else if (sin.compare("resolution") == 0) parseResolution(line);
-		else if (sin.compare("b") == 0) parseBackground(line);
-		else if (sin.compare("l") == 0) parseLight(line);
-		else if (sin.compare("f") == 0) parseMaterial(line);
-		else if (sin.compare("c") == 0) parseCone(line);
-		else if (sin.compare("s") == 0) parseSphere(line);
-		else if (sin.compare("p") == 0) parsePolygon(line);
-		else if (sin.compare("pp") == 0) parsePolygonalPatch(line);
-		else if (sin.compare("pl") == 0) parsePlane(line);
-
-	}
-}
+//Scene *NFFLoader::createScene(std::string &filename)
+//{
+//    scene = new Scene();
+//
+//    std::string sin;
+//    std::ifstream nff_input(filename);
+//    for (std::string line; std::getline(nff_input, line);)
+//    {
+//        sin = line.substr(0, line.find(" "));
+//        if (line.compare("v") == 0) parseViewing(line);
+//        else if (sin.compare("from") == 0) parseFrom(line);
+//        else if (sin.compare("at") == 0) parseAt(line);
+//        else if (sin.compare("up") == 0) parseUp(line);
+//        else if (sin.compare("angle") == 0) parseAngle(line);
+//        else if (sin.compare("hither") == 0) parseHither(line);
+//        else if (sin.compare("resolution") == 0) parseResolution(line);
+//        else if (sin.compare("b") == 0) parseBackground(line);
+//        else if (sin.compare("l") == 0) parseLight(line);
+//        else if (sin.compare("f") == 0) parseMaterial(line);
+//        else if (sin.compare("c") == 0) parseCone(line);
+//        else if (sin.compare("s") == 0) parseSphere(line);
+//        else if (sin.compare("p") == 0) parsePolygon(line);
+//        else if (sin.compare("pp") == 0) parsePolygonalPatch(line);
+//        else if (sin.compare("pl") == 0) parsePlane(line);
+//
+//    }
+//    return scene;
+//}
 
 void NFFLoader::parseViewing(std::string &sin)
 {
