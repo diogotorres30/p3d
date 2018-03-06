@@ -17,6 +17,7 @@
 #include "Plane.h"
 #include "Light.h"
 #include "Camera.h"
+#include "MathAux.h"
 
 class NFFLoader
 {

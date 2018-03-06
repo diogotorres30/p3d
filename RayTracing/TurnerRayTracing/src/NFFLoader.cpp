@@ -49,33 +49,62 @@ void NFFLoader::parseViewing(std::string &sin)
 
 void NFFLoader::parseFrom(std::string s)
 {
-
+	std::istringstream iss(s);
+	std::vector<std::string> results((std::istream_iterator<std::string>(iss)), std::istream_iterator<std::string>());
+	std::string::size_type sz;	
+	Vector3 from = Vector3(std::stof(results[1], &sz), std::stof(results[2], &sz), std::stof(results[3], &sz));
+	camera->setFrom(from);
 }
 
 void NFFLoader::parseAt(std::string s)
 {
+	std::istringstream iss(s);
+	std::vector<std::string> results((std::istream_iterator<std::string>(iss)), std::istream_iterator<std::string>());
+	std::string::size_type sz;
+	Vector3 at = Vector3(std::stof(results[1], &sz), std::stof(results[2], &sz), std::stof(results[3], &sz));
+	camera->setAt(at);
 }
 
 void NFFLoader::parseUp(std::string s)
 {
+	std::istringstream iss(s);
+	std::vector<std::string> results((std::istream_iterator<std::string>(iss)), std::istream_iterator<std::string>());
+	std::string::size_type sz;
+	Vector3 up = Vector3(std::stof(results[1], &sz), std::stof(results[2], &sz), std::stof(results[3], &sz));
+	camera->setUp(up);
 }
 
 void NFFLoader::parseAngle(std::string s)
 {
+	std::istringstream iss(s);
+	std::vector<std::string> results((std::istream_iterator<std::string>(iss)), std::istream_iterator<std::string>());
+	std::string::size_type sz;
+	camera->setAngle(std::stof(results[1], &sz));
 }
 
 void NFFLoader::parseHither(std::string s)
 {
+	std::istringstream iss(s);
+	std::vector<std::string> results((std::istream_iterator<std::string>(iss)), std::istream_iterator<std::string>());
+	std::string::size_type sz;
+	camera->setHither(std::stof(results[1], &sz));
 }
 
 void NFFLoader::parseResolution(std::string s)
 {
+	std::istringstream iss(s);
+	std::vector<std::string> results((std::istream_iterator<std::string>(iss)), std::istream_iterator<std::string>());
+	std::string::size_type sz;
+	camera->setResolution(std::stof(results[1], &sz), std::stof(results[2], &sz));
 }
 
 void NFFLoader::parseBackground(std::string s)
 {
 	std::istringstream iss(s);
 	std::vector<std::string> results((std::istream_iterator<std::string>(iss)), std::istream_iterator<std::string>());
+	std::string::size_type sz;
+	Color up = Color(std::stof(results[1], &sz), std::stof(results[2], &sz), std::stof(results[3], &sz));
+	scene->addBackground(up);
 
 	//create color with the given values and add it to the scene
 	/*Color c = new Color();
