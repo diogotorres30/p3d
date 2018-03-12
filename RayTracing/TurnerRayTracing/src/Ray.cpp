@@ -13,10 +13,3 @@ Ray::Ray(Vector3 org, Vector2 pt)
 Ray::~Ray(){}
 
 
-float Ray::ray_sphere(Mesh *mesh)
-{
-    
-    
-    return 0.0;
-    
-}
