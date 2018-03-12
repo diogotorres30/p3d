@@ -10,32 +10,33 @@ Camera::~Camera()
 
 }
 
-void setFrom(Vector3 f)
+void Camera::setFrom(Vector3 f)
 {
-
+	from = f;
 }
 
-void setAt(Vector3 a)
+void Camera::setAt(Vector3 a)
 {
-
+	at = a;
 }
 
-void setUp(Vector3 u)
+void Camera::setUp(Vector3 u)
 {
-
+	up = u;
 }
 
-void setAngle(float ang)
+void Camera::setAngle(float ang)
 {
-
+	angle = ang;
 }
 
-void setHither(float hit)
+void Camera::setHither(float hit)
 {
-
+	hither = hit;
 }
 
-void setResolution(float x, float y)
+void Camera::setResolution(float x, float y)
 {
-
+	resX = x;
+	resY = y;
 }

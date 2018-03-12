@@ -382,7 +382,7 @@ int main(int argc, char* argv[])
     //INSERT HERE YOUR CODE FOR PARSING NFF FILES
 	NFFLoader loader = NFFLoader();
 	std::string filename = std::string("test_scene.nff");
-	scene = loader.createScene(filename);
+	//scene = loader.createScene(filename);
 
  //   scene = new Scene();
 	//std::string filename = std::string("jap.nff");

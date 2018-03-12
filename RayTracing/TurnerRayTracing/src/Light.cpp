@@ -1,8 +1,7 @@
 #include "Light.h"
 
-Light::Light( Vector3 amb, Vector3 dif, Vector3 spec)
+Light::Light(Vector3 pos, Color col)
 {
-	ambient = amb;
-	diffuse = dif;
-	specular = spec;
+	position = pos;
+	color = col;
 }

@@ -11,19 +11,20 @@
 #include <stdio.h>
 #include <vector>
 
-#include "Scene.h"
 #include "Mesh.h"
 #include "Sphere.h"
 #include "Plane.h"
 #include "Light.h"
 #include "Camera.h"
 #include "MathAux.h"
+#include "Scene.h"
+
 
 class NFFLoader
 {
 
 	private:
-		Scene *scene;
+        Scene *scene;
 		Material *material;
 		Camera *camera;
 

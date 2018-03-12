@@ -2,35 +2,44 @@
 
 Scene::Scene()
 {
-
+    Camera *camera = nullptr;
+    std::vector<Mesh*> meshes = std::vector<Mesh*>();
+    std::vector<Material*> materials = std::vector<Material*>();
+    std::vector<Light*> lights = std::vector<Light*>();
 }
 
 Scene::~Scene()
 {
-
+    
 }
 
 void Scene::setCamera(Camera *cam)
 {
-	camera = cam;
+    camera = cam;
 }
 
-void addMesh(Mesh *mesh)
+void Scene::addMesh(Mesh *mesh)
 {
-
+    meshes.push_back(mesh);
 }
 
-void addMaterial(Material *material)
+void Scene::addMaterial(Material *material)
 {
-
+    materials.push_back(material);
 }
 
-void addBackground(const Color &color)
+void Scene::addBackground(const Color &color)
 {
-
+    background = color;
 }
 
-void addCamera(Camera *cam)
+void Scene::addCamera(Camera *cam)
 {
-
+    camera = cam;
 }
+
+void Scene::addLight(Light *light)
+{
+    lights.push_back(light);
+}
+

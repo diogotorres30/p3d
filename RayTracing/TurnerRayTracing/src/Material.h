@@ -4,44 +4,31 @@
 #include <string>
 #include <sstream>
 #include "MathAux.h"
+#include "Color.h"
+
 class Material {
 
 private:
-	std::string _mat_name;
-	Vector3 _ambient; //Ka
-	Vector3 _diffuse; //Kd
-	Vector3 _specular; //Ks
-	Vector3 _emission; //Ke
-	float _shininess; //Ns
-	float _Ni; //dont know what it is yet
-	float _dissolve; //d - 1== opaque; 0 == fully transparent
-	int _illum;
-	std::string _map_Kd; //path to texture, looks like
+
+    Color color;
+    float kd;
+    float ks;
+    float shine;
+    float t;
+    float index_of_refraction;
 
 public:
 	Material() {};
-	Material(Vector3 amb, Vector3 diff, Vector3 spec, Vector3 emi, float shine);
-	Material(std::stringstream &sin);
-	std::string getName();
-	Vector3 getAmbient();
-	Vector3 getDiffuse();
-	Vector3 getSpecular();
-	Vector3 getEmission();
-	float getShininess();
-	float getNi();
-	float getDissolve();
-	int getIllum();
-	void parseName(std::stringstream &sin);
-	void parseAmbient(std::stringstream &sin);
-	void parseDiffuse(std::stringstream &sin);
-	void parseSpecular(std::stringstream &sin);
-	void parseEmission(std::stringstream &sin);
-	void parseShininess(std::stringstream &sin);
-	void parseNi(std::stringstream &sin);
-	void parseDissolve(std::stringstream &sin);
-	void parseIllum(std::stringstream &sin);
-	void parseMapPath(std::stringstream &sin);
-
+    Material(Color c, float newkd, float newks, float newshine, float newt, float index);
+    float getRed();
+    float getGreen();
+    float getBlue();
+    float getKd();
+    float getKs();
+    float getShine();
+    float getT();
+    float getIndex();
+    
 
 };
 
