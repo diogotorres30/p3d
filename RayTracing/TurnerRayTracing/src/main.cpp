@@ -63,9 +63,13 @@ int WindowHandle = 0;
 
 Color rayTracing( Ray ray, int depth, float RefrIndex)
 {
+
+	for (std::vector<Mesh*>::iterator it = scene->getMeshes().begin(); it != scene->getMeshes().end(); ++it)
+	{
+		float nearestPixel;
+			
+	}
 /*
-	For each pixel in the viewport;
-	shoot a ray;
 	for each object in the scene
 	compute intersection ray-object;
 	store the closest intersection;
@@ -244,11 +248,11 @@ void renderScene()
         {
             
             //YOUR 2 FUNTIONS:
-            //Ray ray = Ray(scene->getCamera()->getFrom(),Vector2(x, y));
-            //Color color = rayTracing(ray, 1, 1.0 );
+            Ray ray = Ray(scene->getCamera()->getFrom(),Vector2(x, y));
+            Color color = rayTracing(ray, 1, 1.0);
             
 			//test with a red screen
-			Color color = Color(1.0f, 0.0f, 0.0f);
+			//Color color = Color(1.0f, 0.0f, 0.0f);
 
             vertices[index_pos++]= (float)x;
             vertices[index_pos++]= (float)y;
