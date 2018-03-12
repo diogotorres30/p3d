@@ -13,6 +13,7 @@ Scene *NFFLoader::createScene(std::string &filename)
 
     std::string sin;
     std::ifstream nff_input(filename);
+	
     for (std::string line; std::getline(nff_input, line);)
     {
         sin = line.substr(0, line.find(" "));
@@ -31,7 +32,6 @@ Scene *NFFLoader::createScene(std::string &filename)
         else if (sin.compare("p") == 0) parsePolygon(line);
         else if (sin.compare("pp") == 0) parsePolygonalPatch(line);
         else if (sin.compare("pl") == 0) parsePlane(line);
-
     }
     return scene;
 }
@@ -39,13 +39,6 @@ Scene *NFFLoader::createScene(std::string &filename)
 void NFFLoader::parseViewing(std::string &sin)
 {
 	camera = new Camera();
-
-	/*std::istringstream iss(s);
-	std::vector<std::string> results((std::istream_iterator<std::string>(iss)), std::istream_iterator<std::string>());*/
-
-	//Depois e chamar a respectiva utilizando as posicoes correctas do vector 'results' criado acima
-
-
 }
 
 void NFFLoader::parseFrom(std::string s)
@@ -106,10 +99,7 @@ void NFFLoader::parseBackground(std::string s)
 	std::string::size_type sz;
 	Color up = Color(std::stof(results[1], &sz), std::stof(results[2], &sz), std::stof(results[3], &sz));
 	scene->addBackground(up);
-
 	//create color with the given values and add it to the scene
-	/*Color c = new Color();
-	scene->addBackground(c);*/
 }
 
 void NFFLoader::parseLight(std::string s)
@@ -117,21 +107,22 @@ void NFFLoader::parseLight(std::string s)
 	std::istringstream iss(s);
 	std::vector<std::string> results((std::istream_iterator<std::string>(iss)), std::istream_iterator<std::string>());
 	std::string::size_type sz;
-
 	Vector3 pos = Vector3(std::stof(results[1], &sz), std::stof(results[2], &sz), std::stof(results[3], &sz));
 	Color col = Color(std::stof(results[3], &sz), std::stof(results[4], &sz), std::stof(results[5], &sz));
-	scene->addLight(col);
+	Light *l = new Light(pos, col);
+	scene->addLight(l);
 	//create light and add it to the scene
-	//Light *light = new Light();
-	//scene->addLight(light);
 }
 
 void NFFLoader::parseMaterial(std::string s)
 {
+	std::istringstream iss(s);
+	std::vector<std::string> results((std::istream_iterator<std::string>(iss)), std::istream_iterator<std::string>());
+	std::string::size_type sz;
+	Color col = Color(std::stof(results[1], &sz), std::stof(results[2], &sz), std::stof(results[3], &sz));
+	Material *mat = new Material(col, std::stof(results[4], &sz), std::stof(results[5], &sz), std::stof(results[6], &sz), std::stof(results[7], &sz), std::stof(results[8], &sz));
+	scene->addMaterial(mat);
 	//create material with the given values, add it to the scene and store in a variable to use in the creation of new meshs
-	//Material *mat = new Material();
-	//material = mat;
-	//scene->addMaterial(mat);
 }
 
 void NFFLoader::parseCone(std::string s)
@@ -141,9 +132,13 @@ void NFFLoader::parseCone(std::string s)
 
 void NFFLoader::parseSphere(std::string s)
 {
+	std::istringstream iss(s);
+	std::vector<std::string> results((std::istream_iterator<std::string>(iss)), std::istream_iterator<std::string>());
+	std::string::size_type sz;
+	Vector3 center = Vector3(std::stof(results[1], &sz), std::stof(results[2], &sz), std::stof(results[3], &sz));
 	//create sphere and add it to the scene as a mesh with the appropriate material
-	//Sphere *sphere = new Sphere();
-	//scene->addMesh(sphere, material);
+	Sphere *sphere = new Sphere(center, std::stof(results[4], &sz),scene->getMaterials().back());
+	scene->addMesh(sphere);
 }
 
 void NFFLoader::parsePolygon(std::string s)
@@ -158,9 +153,15 @@ void NFFLoader::parsePolygonalPatch(std::string s)
 
 void NFFLoader::parsePlane(std::string s)
 {
+	std::istringstream iss(s);
+	std::vector<std::string> results((std::istream_iterator<std::string>(iss)), std::istream_iterator<std::string>());
+	std::string::size_type sz;
+	Vector3 a = Vector3(std::stof(results[1], &sz), std::stof(results[2], &sz), std::stof(results[3], &sz));
+	Vector3 b = Vector3(std::stof(results[4], &sz), std::stof(results[5], &sz), std::stof(results[6], &sz));
+	Vector3 c = Vector3(std::stof(results[7], &sz), std::stof(results[8], &sz), std::stof(results[9], &sz));
 	//create plane and add it to the scene as a mesh with the appropriate material
-	//Plane *plane = new Plane();
-	//scene->addMesh(plane, material);
+	Plane *plane = new Plane(a,b,c,scene->getMaterials().back());
+	scene->addMesh(plane);
 }
 
 
