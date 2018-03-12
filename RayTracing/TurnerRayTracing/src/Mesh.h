@@ -9,6 +9,7 @@
 #include <GL/freeglut.h>
 #endif
 
+#include <math.h>
 #include "MathAux.h"
 #include "Material.h"
 #include "Ray.h"
@@ -21,7 +22,7 @@ class Mesh
     public:
         Mesh();
         Mesh(Material* mat);
-        virtual float intersect(Ray r) = 0;
+        virtual float intersect(Ray ray) = 0;
 
 };
 

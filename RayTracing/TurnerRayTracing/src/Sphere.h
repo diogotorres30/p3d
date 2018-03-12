@@ -12,7 +12,7 @@ class Sphere : public Mesh
     public:
         Sphere();
         Sphere(Vector3 &newcenter, float radius, Material *mat);
-        float intersect(Ray r);
+        float intersect(Ray ray);
     
 };
 
