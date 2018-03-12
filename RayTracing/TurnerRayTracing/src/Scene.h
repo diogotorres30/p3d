@@ -21,8 +21,12 @@ class Scene
     
     public:
         Scene();
-        ~Scene();
+		~Scene() {};
         Camera *getCamera() { return camera; };
+		std::vector<Mesh*> getMeshes() { return meshes; };
+		std::vector<Material*> getMaterials() { return materials; };
+		std::vector<Light*> getLights() { return lights; };
+		Color getBackground() { return background; };
         void setCamera(Camera *cam);
         void addMesh(Mesh *mesh);
         void addMaterial(Material *material);

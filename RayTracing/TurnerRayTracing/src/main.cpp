@@ -384,11 +384,11 @@ int main(int argc, char* argv[])
 	std::string filename = std::string("test_scene.nff");
 	//scene = loader.createScene(filename);
 
- //   scene = new Scene();
+	//scene = new Scene();
 	//std::string filename = std::string("jap.nff");
- //   if(!(scene->load_nff(filename))) return 0;
-    //RES_X = scene->GetCamera()->GetResX();
-    //RES_Y = scene->GetCamera()->GetResY();
+	//if(!(scene->load_nff(filename))) return 0;
+    //RES_X = scene->getCamera()->getResX();
+    //RES_Y = scene->getCamera()->getResY();
 	RES_X = RES_Y = 512;
     
     if(draw_mode == 0) { // desenhar o conte˙do da janela ponto a ponto
