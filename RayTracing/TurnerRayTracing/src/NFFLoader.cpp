@@ -120,7 +120,7 @@ void NFFLoader::parseLight(std::string s)
 
 	Vector3 pos = Vector3(std::stof(results[1], &sz), std::stof(results[2], &sz), std::stof(results[3], &sz));
 	Color col = Color(std::stof(results[3], &sz), std::stof(results[4], &sz), std::stof(results[5], &sz));
-	scene->addLight(col);
+	//scene->addLight(col);
 	//create light and add it to the scene
 	//Light *light = new Light();
 	//scene->addLight(light);

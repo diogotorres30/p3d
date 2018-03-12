@@ -11,6 +11,7 @@
 
 #include "MathAux.h"
 #include "Material.h"
+#include "Ray.h"
 
 class Mesh
 {
@@ -20,6 +21,7 @@ class Mesh
     public:
         Mesh();
         Mesh(Material* mat);
+        virtual float intersect(Ray r) = 0;
 
 };
 
