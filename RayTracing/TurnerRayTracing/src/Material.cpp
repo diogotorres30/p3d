@@ -33,3 +33,15 @@ float Material::getT() {
 float Material::getIndex() {
     return index_of_refraction;
 }
+
+float Material::getRed() {
+	return color.r;
+}
+
+float Material::getGreen() {
+	return color.g;
+}
+
+float Material::getBlue() {
+	return color.b;
+}

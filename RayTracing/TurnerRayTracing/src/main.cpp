@@ -63,18 +63,39 @@ int WindowHandle = 0;
 
 Color rayTracing( Ray ray, int depth, float RefrIndex)
 {
-	float nearestPixel = 100.0f;
-	float pixel;
+	float nearestT = 100.0f;
+	float t = 0.0f, red = 0.0f, green = 0.0f, blue = 0.0f;
+	Mesh *nearestMesh = nullptr;
 	std::vector<Mesh*> meshes = scene->getMeshes();
 	for (std::vector<Mesh*>::iterator it = meshes.begin(); it != meshes.end(); ++it)
 	{
-		pixel = (*it)->intersect(ray);
-		if (pixel > 0.0f && pixel < nearestPixel)
+		t = (*it)->intersect(ray);
+		if (t > 0.0f && t < nearestT)
 		{
-			nearestPixel = pixel;
-			return Color(1.0f, 0.0f, 0.0f);
+			nearestT = t;
+			//nearestMesh = (*it);
+			red = (*it)->material->getRed();
+			green = (*it)->material->getGreen();
+			blue = (*it)->material->getBlue();
+			//return Color(1.0f, 0.9f, 0.7f);
 		}		
+		
 	}
+	//for (Mesh *mesh : meshes)
+	//{
+	//	t = mesh->intersect(ray);
+	//		if (t > 0.0f && t < nearestT)
+	//		{
+	//			nearestT = t;
+	//			red = mesh->material->getRed();
+	//			green = mesh->material->getGreen();
+	//			blue = mesh->material->getBlue();
+	//			//return Color(1.0f, 0.9f, 0.7f);
+	//		}		
+	//}
+
+	return Color(red, green, blue);
+
 /*
 	for each object in the scene
 	compute intersection ray-object;
@@ -85,7 +106,7 @@ Color rayTracing( Ray ray, int depth, float RefrIndex)
 	shade the pixel with background color
 */
 
-	return Color(0.0f, 1.0f, 0.0f);
+	//return Color(0.0f, 1.0f, 0.0f);
 }
 
 /////////////////////////////////////////////////////////////////////// ERRORS
@@ -106,7 +127,7 @@ void checkOpenGLError(std::string error)
 {
     if(isOpenGLError()) {
         std::cerr << error << std::endl;
-        exit(EXIT_FAILURE);
+        //exit(EXIT_FAILURE);
     }
 }
 /////////////////////////////////////////////////////////////////////// SHADERs
@@ -257,9 +278,6 @@ void renderScene()
             Ray ray = Ray(scene->getCamera(),Vector2(x, y));
             Color color = rayTracing(ray, 1, 1.0);
             
-			//test with a red screen
-			//Color color = Color(1.0f, 0.0f, 0.0f);
-
             vertices[index_pos++]= (float)x;
             vertices[index_pos++]= (float)y;
             colors[index_col++]= (float)color.r;

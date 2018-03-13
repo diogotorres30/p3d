@@ -19,11 +19,9 @@ float Plane::intersect(Ray ray){
     if(nd == 0)
         return t;
     
-    float d = dot(normal, p1);
-    t = -1 * ((dot(normal, ray.origin) + d) / (nd));
-    
-    if(t < 0)
-        return -1.0;
+    //float d = dot(normal, p1);
+    //t = -1 * ((dot(normal, ray.origin) + d) / (nd));
+	t = -1 * (dot((ray.origin - p1), normal) / nd);
     
     return t;
 }
