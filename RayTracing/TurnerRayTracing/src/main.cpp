@@ -391,7 +391,11 @@ int main(int argc, char* argv[])
 {
     //INSERT HERE YOUR CODE FOR PARSING NFF FILES
 	NFFLoader loader = NFFLoader();
-	std::string filename = std::string("../../RayTracing/TurnerRayTracing/src/test_scene.nff");
+    #ifdef __APPLE__
+        std::string filename = std::string("test_scene.nff");
+    #else
+       std::string filename = std::string("../../RayTracing/TurnerRayTracing/src/test_scene.nff");
+    #endif
 	scene = loader.createScene(filename);
 	scene->getCamera()->calculate();
 
