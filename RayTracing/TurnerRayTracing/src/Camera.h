@@ -1,35 +1,14 @@
-#ifndef __CAMERA_H__
-#define __CAMERA_H__
+//
+//  Camera.hpp
+//  P3D_Project
+//
+//  Created by Catarina Pessoa Jorge on 13/03/2018.
+//  Copyright © 2018 group08. All rights reserved.
+//
 
-#include "MathAux.h"
+#ifndef Camera_hpp
+#define Camera_hpp
 
-class Camera
-{
-	private:
-		Vector3 from, at, up;
-		Vector3 xe, ye, ze;
-		float fov, hither, h, w, df, zNear, zFar;
-		int resX, resY;
+#include <stdio.h>
 
-	public:
-		Camera();
-		~Camera();
-		void setFrom(Vector3 f);
-		void setAt(Vector3 a);
-		void setUp(Vector3 u);
-		void setFov(float ang);
-		void setHither(float hit);
-		void setResolution(float x, float y);
-		Vector3 getFrom() { return from; };
-		int getResX() { return resX; };
-		int getResY() { return resY; };
-		Vector3 getXe() { return xe; };
-		Vector3 getYe() { return ye; };
-		Vector3 getZe() { return ze; };
-		float getDf() { return df; };
-		float getHeight() { return h; };
-		float getWidth() { return w; };
-		void calculate();
-};
-
-#endif // !__CAMERA_H__
+#endif /* Camera_hpp */
