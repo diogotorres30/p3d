@@ -394,7 +394,7 @@ int main(int argc, char* argv[])
     #ifdef __APPLE__
         std::string filename = std::string("test_scene.nff");
     #else
-       std::string filename = std::string("../../RayTracing/TurnerRayTracing/src/test_scene.nff");
+       std::string filename = std::string("../../RayTracing/TurnerRayTracing/src/nffs/test_scene.nff");
     #endif
 	scene = loader.createScene(filename);
 	scene->getCamera()->calculate();
