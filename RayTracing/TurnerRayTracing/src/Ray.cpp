@@ -2,11 +2,11 @@
 
 Ray::Ray(){}
 
-Ray::Ray(Vector3 org, Vector2 pt)
+Ray::Ray(Camera *camera, Vector2 pt)
 {
-	origin = org;
-	point = Vector3(pt, 0.0f);
-	direction = normalized(point - origin);
+	point = Vector3(0.0f);
+	origin = camera->getFrom();
+	direction = -camera->getDf()*camera->getZe() + camera->getHeight()*((camera->getFrom().y / camera->getResY()) - 0.5)*camera->getYe() + camera->getWidth()*((camera->getFrom().x / camera->getResY()) - 0.5)*camera->getXe();
 	scalar = 0;
 }
 

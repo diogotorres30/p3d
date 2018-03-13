@@ -7,11 +7,9 @@ class Camera
 {
 	private:
 		Vector3 from, at, up;
-		float angle, hither;
+		Vector3 xe, ye, ze;
+		float fov, hither, h, w, df, zNear, zFar;
 		int resX, resY;
-		float fovy, aspect, zNear, zFar, speed;
-		Matrix4 projection, orthographic, perspective;
-		Matrix4 viewMatrix;
 
 	public:
 		Camera();
@@ -19,12 +17,19 @@ class Camera
 		void setFrom(Vector3 f);
 		void setAt(Vector3 a);
 		void setUp(Vector3 u);
-		void setAngle(float ang);
+		void setFov(float ang);
 		void setHither(float hit);
 		void setResolution(float x, float y);
 		Vector3 getFrom() { return from; };
 		int getResX() { return resX; };
 		int getResY() { return resY; };
+		Vector3 getXe() { return xe; };
+		Vector3 getYe() { return ye; };
+		Vector3 getZe() { return ze; };
+		float getDf() { return df; };
+		float getHeight() { return h; };
+		float getWidth() { return w; };
+		void calculate();
 };
 
 #endif // !__CAMERA_H__

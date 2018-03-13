@@ -2,6 +2,7 @@
 #define __RAY_H__
 
 #include "MathAux.h"
+#include "Camera.h"
 
 class Ray
 {
@@ -10,7 +11,7 @@ class Ray
 		Vector3 direction;
 		float scalar;
 		Ray();
-		Ray(Vector3 org, Vector2 pt);
+		Ray(Camera *camera, Vector2 pt);
 		~Ray();
     
 };

@@ -25,9 +25,9 @@ void Camera::setUp(Vector3 u)
 	up = u;
 }
 
-void Camera::setAngle(float ang)
+void Camera::setFov(float ang)
 {
-	angle = ang;
+	fov = degreesToRadians(ang);
 }
 
 void Camera::setHither(float hit)
@@ -39,4 +39,17 @@ void Camera::setResolution(float x, float y)
 {
 	resX = x;
 	resY = y;
+}
+
+void Camera::calculate()
+{
+	df = norm(from - at);
+
+	h = 2.0f * df * tan(fov / 2);
+	w = (resX / resY) * h;
+
+	ze = (1/df) * (from - at);
+	Vector3 external = cross(up, ze);
+	xe = (1/norm(external)) * external;
+	ye = cross(ze, xe);
 }

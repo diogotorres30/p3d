@@ -39,6 +39,7 @@ Scene *NFFLoader::createScene(std::string &filename)
 void NFFLoader::parseViewing(std::string &sin)
 {
 	camera = new Camera();
+	scene->setCamera(camera);
 }
 
 void NFFLoader::parseFrom(std::string s)
@@ -73,7 +74,7 @@ void NFFLoader::parseAngle(std::string s)
 	std::istringstream iss(s);
 	std::vector<std::string> results((std::istream_iterator<std::string>(iss)), std::istream_iterator<std::string>());
 	std::string::size_type sz;
-	camera->setAngle(std::stof(results[1], &sz));
+	camera->setFov(std::stof(results[1], &sz));
 }
 
 void NFFLoader::parseHither(std::string s)

@@ -63,11 +63,17 @@ int WindowHandle = 0;
 
 Color rayTracing( Ray ray, int depth, float RefrIndex)
 {
-
-	for (std::vector<Mesh*>::iterator it = scene->getMeshes().begin(); it != scene->getMeshes().end(); ++it)
+	float nearestPixel = 100.0f;
+	float pixel;
+	std::vector<Mesh*> meshes = scene->getMeshes();
+	for (std::vector<Mesh*>::iterator it = meshes.begin(); it != meshes.end(); ++it)
 	{
-		float nearestPixel;
-			
+		pixel = (*it)->intersect(ray);
+		if (pixel > 0.0f && pixel < nearestPixel)
+		{
+			nearestPixel = pixel;
+			return Color(1.0f, 0.0f, 0.0f);
+		}		
 	}
 /*
 	for each object in the scene
@@ -79,7 +85,7 @@ Color rayTracing( Ray ray, int depth, float RefrIndex)
 	shade the pixel with background color
 */
 
-	return Color();
+	return Color(0.0f, 1.0f, 0.0f);
 }
 
 /////////////////////////////////////////////////////////////////////// ERRORS
@@ -248,7 +254,7 @@ void renderScene()
         {
             
             //YOUR 2 FUNTIONS:
-            Ray ray = Ray(scene->getCamera()->getFrom(),Vector2(x, y));
+            Ray ray = Ray(scene->getCamera(),Vector2(x, y));
             Color color = rayTracing(ray, 1, 1.0);
             
 			//test with a red screen
@@ -387,13 +393,13 @@ int main(int argc, char* argv[])
 	NFFLoader loader = NFFLoader();
 	std::string filename = std::string("../../RayTracing/TurnerRayTracing/src/test_scene.nff");
 	scene = loader.createScene(filename);
+	scene->getCamera()->calculate();
 
 	//scene = new Scene();
 	//std::string filename = std::string("jap.nff");
 	//if(!(scene->load_nff(filename))) return 0;
-    //RES_X = scene->getCamera()->getResX();
-    //RES_Y = scene->getCamera()->getResY();
-	RES_X = RES_Y = 512;
+    RES_X = scene->getCamera()->getResX();
+    RES_Y = scene->getCamera()->getResY();
     
     if(draw_mode == 0) { // desenhar o conte˙do da janela ponto a ponto
         size_vertices = 2*sizeof(float);
