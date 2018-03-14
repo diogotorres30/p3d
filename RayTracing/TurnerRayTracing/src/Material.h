@@ -20,6 +20,7 @@ private:
 public:
 	Material() {};
     Material(Color c, float newkd, float newks, float newshine, float newt, float index);
+	Color getColor();
     float getRed();
     float getGreen();
     float getBlue();

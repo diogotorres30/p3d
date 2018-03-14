@@ -8,19 +8,19 @@ Sphere::Sphere(Vector3 &newcenter, float newradius, Material *mat) : Mesh(mat)
     radius = newradius;
 }
 
-float Sphere::intersect(Ray ray){
+float Sphere::intersect(Ray &ray){
     float t = -1.0;
     float radius2 = radius * radius;
     Vector3 dist = center - ray.origin;
-    float dist2 = quadrance(dist);
+    dist2 = quadrance(dist);
     float b = dot(ray.direction, dist);
     
-    if(dist2 > radius2 && b < 0)
+    if(dist2 > radius2 && b < 0.0f)
         return t;
     
     float R = (b * b) - dist2 + radius2;
     
-    if(R < 0.0)
+    if(R < 0.0f)
         return t;
         
     if (dist2 > radius2)
@@ -33,4 +33,16 @@ float Sphere::intersect(Ray ray){
     ray.point.z = ray.origin.z + ( ray.direction.z * t );
     
     return t;
+}
+
+Vector3 Sphere::getNormal(Ray &ray)
+{
+	if (dist2 < (radius*radius))
+	{
+		return Vector3(-(ray.point.x - center.x) / radius, -(ray.point.y - center.y) / radius, -(ray.point.z - center.z) / radius);
+	}
+	else
+	{
+		return Vector3((ray.point.x - center.x) / radius, (ray.point.y - center.y) / radius, (ray.point.z - center.z) / radius);
+	}
 }

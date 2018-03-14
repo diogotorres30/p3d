@@ -13,6 +13,10 @@ Material::Material(Color c, float newkd, float newks, float newshine, float newt
 
 /***************** GETTERS ******************/
 
+Color Material::getColor()
+{
+	return color;
+}
 
 float Material::getKd() {
     return kd;

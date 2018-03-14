@@ -16,13 +16,15 @@
 
 class Mesh
 {
-    public:
+    private:
         Material* material;
 
     public:
         Mesh();
         Mesh(Material* mat);
-        virtual float intersect(Ray ray) = 0;
+		Material *getMaterial();
+        virtual float intersect(Ray &ray) = 0;
+		virtual Vector3 getNormal(Ray &ray) = 0;
 
 };
 

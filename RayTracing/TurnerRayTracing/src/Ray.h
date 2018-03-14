@@ -12,6 +12,7 @@ class Ray
 		float scalar;
 		Ray();
 		Ray(Camera *camera, Vector2 pt);
+		Ray(Vector3 orig, Vector3 dir);
 		~Ray();
     
 };

@@ -15,6 +15,7 @@
 #include <fstream>
 #include <string>
 #include <stdio.h>
+#include <algorithm>  
 
 #include <GL/glew.h>
 #ifdef __APPLE__
@@ -61,11 +62,13 @@ int WindowHandle = 0;
 
 ///////////////////////////////////////////////////////////////////////  RAY-TRACE SCENE
 
-Color rayTracing( Ray ray, int depth, float RefrIndex)
+Color rayTracing(Ray ray, int depth, float RefrIndex)
 {
+	Color color;
 	float nearestT = 100.0f;
-	float t = 0.0f, red = 0.0f, green = 0.0f, blue = 0.0f;
+	float t = 0.0f;
 	Mesh *nearestMesh = nullptr;
+
 	std::vector<Mesh*> meshes = scene->getMeshes();
 	for (std::vector<Mesh*>::iterator it = meshes.begin(); it != meshes.end(); ++it)
 	{
@@ -73,40 +76,86 @@ Color rayTracing( Ray ray, int depth, float RefrIndex)
 		if (t > 0.0f && t < nearestT)
 		{
 			nearestT = t;
-			//nearestMesh = (*it);
-			red = (*it)->material->getRed();
-			green = (*it)->material->getGreen();
-			blue = (*it)->material->getBlue();
-			//return Color(1.0f, 0.9f, 0.7f);
-		}		
-		
+			nearestMesh = (*it);
+		}			
 	}
-	//for (Mesh *mesh : meshes)
-	//{
-	//	t = mesh->intersect(ray);
-	//		if (t > 0.0f && t < nearestT)
-	//		{
-	//			nearestT = t;
-	//			red = mesh->material->getRed();
-	//			green = mesh->material->getGreen();
-	//			blue = mesh->material->getBlue();
-	//			//return Color(1.0f, 0.9f, 0.7f);
-	//		}		
+
+	if (nearestT == 100.0f)
+	{
+		return scene->getBackground();
+	}
+	else
+	{
+		color = nearestMesh->getMaterial()->getColor() * nearestMesh->getMaterial()->getKd();
+		Vector3 normal = normalized(nearestMesh->getNormal(ray));
+
+		std::vector<Light*> lights = scene->getLights();
+		for (std::vector<Light*>::iterator it = lights.begin(); it != lights.end(); ++it)
+		{
+			Vector3 L = normalized((*it)->getPosition() - ray.point);
+			float Ldistance = norm((*it)->getPosition() - ray.point);
+			float LNormal = std::max(0.0f, dot(L, normal));
+
+			if(LNormal > 0.0f)
+			{
+				Vector3 fixedPoint = ray.point + 0.0001 * L;
+				Ray shadowRay = Ray(fixedPoint, L);
+
+				t = 0.0f;
+				nearestT = 100.0f;
+
+				for (std::vector<Mesh*>::iterator it = meshes.begin(); it != meshes.end(); ++it)
+				{
+					t = (*it)->intersect(shadowRay);
+					if (t > 0.0f && t < nearestT)
+					{
+						nearestT = t;
+					}
+				}
+
+				Vector3 v = normalized(scene->getCamera()->getFrom() - ray.point);
+				Vector3 reflected = 2.0f * dot(v, normal) * normal - v;
+
+				if (nearestT < 0.0f || nearestT < Ldistance)
+				{
+					Color cd = nearestMesh->getMaterial()->getKd() * (*it)->getColor() * LNormal;
+					Color cs = nearestMesh->getMaterial()->getKs() * (*it)->getColor() * pow(std::max(0.0f, dot(reflected, L)), nearestMesh->getMaterial()->getShine());
+					color += cd + cs;
+				}
+			}
+		}
+
+		if (depth <= MAX_DEPTH)
+		{
+			return color;
+		}
+
+		return color;
+	}
+	//	color = object material’s ambient color;
+	//	compute normal at the hit point;
+	//	for (each source light) {
+	//		L = unit light vector from hit point to light source;
+	//		if (L • normal>0)
+	//			if (!point in shadow); //trace shadow ray
+	//		color += diffuse color + specular color;
+	//	}
+	//	if (depth >= maxDepth) return color;
+
+	//	if (reflective object) {
+	//		rRay = calculate ray in the reflected direction;
+	//		rColor = trace(scene, point, rRay direction, depth + 1);
+	//		reduce rColor by the specular reflection coefficient and add to color;
+	//	}
+	//	if (translucid object) {
+	//		tRay = calculate ray in the refracted direction;
+	//		tColor = trace(scene, point, tRay direction, depth + 1);
+	//		reduce tColor by the transmittance coefficient and add to color;
+	//	}
+	//	return color;
 	//}
 
-	return Color(red, green, blue);
-
-/*
-	for each object in the scene
-	compute intersection ray-object;
-	store the closest intersection;
-	if there is an intersection
-	shade the pixel using color, lights, materials;
-	else  "ray misses all objects"
-	shade the pixel with background color
-*/
-
-	//return Color(0.0f, 1.0f, 0.0f);
+	//return color;
 }
 
 /////////////////////////////////////////////////////////////////////// ERRORS
