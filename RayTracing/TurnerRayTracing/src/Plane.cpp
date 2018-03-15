@@ -20,10 +20,6 @@ float Plane::intersect(Ray &ray){
         return t;
     
 	t = -1 * (dot((ray.origin - p1), normal) / nd);
-
-	ray.point.x = ray.origin.x + (ray.direction.x * t);
-	ray.point.y = ray.origin.y + (ray.direction.y * t);
-	ray.point.z = ray.origin.z + (ray.direction.z * t);
     
     return t;
 }

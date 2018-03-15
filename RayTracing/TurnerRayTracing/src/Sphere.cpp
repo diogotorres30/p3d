@@ -28,10 +28,6 @@ float Sphere::intersect(Ray &ray){
     else
         t = b + sqrt(R);
     
-    ray.point.x = ray.origin.x + ( ray.direction.x * t );
-    ray.point.y = ray.origin.y + ( ray.direction.y * t );
-    ray.point.z = ray.origin.z + ( ray.direction.z * t );
-    
     return t;
 }
 
