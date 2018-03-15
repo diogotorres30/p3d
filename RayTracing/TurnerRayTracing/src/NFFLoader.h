@@ -47,7 +47,7 @@ class NFFLoader
 		void parseMaterial(std::string sin);
 		void parseCone(std::string sin);
 		void parseSphere(std::string sin);
-		void parsePolygon(std::string sin);
+		void parsePolygon(std::string line1, std::string line2, std::string line3);
 		void parsePolygonalPatch(std::string sin);
 		void parsePlane(std::string sin);
 };

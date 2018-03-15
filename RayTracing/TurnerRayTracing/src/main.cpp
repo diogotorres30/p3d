@@ -70,6 +70,7 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 	Mesh *nearestMesh = nullptr;
 	Vector3 intersectionPoint = Vector3(0.0f);
 	Vector3 fixedPoint = Vector3(0.0f), reflected = Vector3(0.0f);
+    Vector3 v = Vector3(0.0f);
 
 	std::vector<Mesh*> meshes = scene->getMeshes();
 	for (std::vector<Mesh*>::iterator itMesh = meshes.begin(); itMesh != meshes.end(); ++itMesh)
@@ -101,59 +102,61 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 			float LDistance = norm((*itLight)->getPosition() - ray.point);
 			float LNormal = std::max(dot(normal, L), 0.0f);
 
-			//if(LNormal > 0.0f)
-			//{
-				Vector3 fixedPoint = ray.point + 0.0001f * L;
-				Ray shadowRay = Ray(fixedPoint, L);
+            fixedPoint = ray.point + 0.0001f;
+            Ray shadowRay = Ray(fixedPoint, L);
+            t = 0.0f;
+            nearestT = 100.0f;
+            bool shadowIntersection = false;
 
-				t = 0.0f;
-				nearestT = 100.0f;
-				bool shadowIntersection = false;
+            for (std::vector<Mesh*>::iterator itMesh = meshes.begin(); itMesh != meshes.end(); ++itMesh)
+            {
+                t = (*itMesh)->intersect(shadowRay);
+                if (t > 0.0f && t < nearestT)
+                {
+                    shadowIntersection = true;
+                    nearestT = t;
+                }
+            }
 
-				for (std::vector<Mesh*>::iterator itMesh = meshes.begin(); itMesh != meshes.end(); ++itMesh)
-				{
-					t = (*itMesh)->intersect(shadowRay);
-					if (t > 0.0f && t < nearestT)
-					{
-						shadowIntersection = true;
-						nearestT = t;
-					}
-				}
+            v = normalized(scene->getCamera()->getFrom() - ray.point);
+            reflected = 2.0f * dot(v, normal) * normal - v;
 
-				Vector3 v = normalized(scene->getCamera()->getFrom() - ray.point);
-				reflected = 2.0f * dot(v, normal) * normal - v;
+            //float attenuation = 1.0 / (1.0f + 0.09f * LDistance + 0.0002f * (LDistance * LDistance));
+            //Vector3 halfwayDir = normalized(L + v);
 
-				float attenuation = 1.0 / (1.0f + 0.09f * LDistance + 0.0002f * (LDistance * LDistance));
-				Vector3 halfwayDir = normalized(L + v);
-
-				if ((!shadowIntersection))
-				{
-					//Color ca = (*itLight)->getColor() * nearestMesh->getMaterial()->getKd() * nearestMesh->getMaterial()->getColor();
-					Color cd = (*itLight)->getColor() * nearestMesh->getMaterial()->getKd() * nearestMesh->getMaterial()->getColor() * LNormal /** attenuation*/;
-					Color cs = (*itLight)->getColor() * nearestMesh->getMaterial()->getKs() * nearestMesh->getMaterial()->getColor() * pow(std::max(dot(reflected, L), 0.0f), nearestMesh->getMaterial()->getShine())/* * attenuation*/;
-					color += cd + cs;
-				}
-			//}
+            if ((!shadowIntersection))
+            {
+                //Color ca = (*itLight)->getColor() * nearestMesh->getMaterial()->getKd() * nearestMesh->getMaterial()->getColor();
+                Color cd = (*itLight)->getColor() * nearestMesh->getMaterial()->getKd() * nearestMesh->getMaterial()->getColor() * LNormal /** attenuation*/;
+                Color cs = (*itLight)->getColor() * nearestMesh->getMaterial()->getKs() * nearestMesh->getMaterial()->getColor() * pow(std::max(dot(reflected, L), 0.0f), nearestMesh->getMaterial()->getShine())/* * attenuation*/;
+                color += cd + cs;
+            }
 		}
 
-		if (depth <= MAX_DEPTH)
+		if (depth >= MAX_DEPTH)
 		{
 			return color;
 		}
-
-		if ((1 - nearestMesh->getMaterial()->getT()) > 0.0f)
+       
+		if ((1.0f - nearestMesh->getMaterial()->getT()) > 0.0f)
 		{
 			Ray rRay = Ray(fixedPoint, reflected);
 			Color rColor = rayTracing(rRay, depth + 1, nearestMesh->getMaterial()->getIndex());
-			color += rColor * nearestMesh->getMaterial()->getKs();
+            color += rColor * nearestMesh->getMaterial()->getKs() * nearestMesh->getMaterial()->getColor() * (1.0f - nearestMesh->getMaterial()->getT());
 		}
 
-		/*if (nearestMesh->getMaterial()->getT() > 0.0f)
-		{
-			Ray tRay = Ray(fixedPoint, reflected);
-			Color tColor = rayTracing(tRay, depth + 1, nearestMesh->getMaterial()->getIndex());
-			color += tColor * nearestMesh->getMaterial()->getT();
-		}*/
+        if (nearestMesh->getMaterial()->getT() > 0.0f)
+        {
+            Vector3 vt = dot(v, normal) * normal - v;
+            float sinthetai = norm(vt);
+            float sinthetat = (RefrIndex/nearestMesh->getMaterial()->getIndex()) * sinthetai;
+            float costhetat = sqrt((1- (sinthetat * sinthetat)));
+            Vector3 tHat = (1 / sinthetai) * vt;
+            Vector3 rt = sinthetat * tHat + costhetat * (-normal);
+            Ray tRay = Ray(fixedPoint, rt);
+            Color tColor = rayTracing(tRay, depth + 1, nearestMesh->getMaterial()->getIndex());
+            color += tColor * nearestMesh->getMaterial()->getT();
+        }
 
 		return color;
 	}

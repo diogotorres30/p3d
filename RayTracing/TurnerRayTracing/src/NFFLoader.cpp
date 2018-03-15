@@ -11,7 +11,7 @@ Scene *NFFLoader::createScene(std::string &filename)
 {
     scene = new Scene();
 
-    std::string sin;
+    std::string sin, line1, line2, line3;
     std::ifstream nff_input(filename);
 	
     for (std::string line; std::getline(nff_input, line);)
@@ -29,7 +29,14 @@ Scene *NFFLoader::createScene(std::string &filename)
         else if (sin.compare("f") == 0) parseMaterial(line);
         else if (sin.compare("c") == 0) parseCone(line);
         else if (sin.compare("s") == 0) parseSphere(line);
-        else if (sin.compare("p") == 0) parsePolygon(line);
+        else if (sin.compare("p") == 0)
+        {
+            std::getline(nff_input, line1);
+            std::getline(nff_input, line2);
+            std::getline(nff_input, line3);
+            parsePolygon(line1, line2, line3);
+            
+        }
         else if (sin.compare("pp") == 0) parsePolygonalPatch(line);
         else if (sin.compare("pl") == 0) parsePlane(line);
     }
@@ -142,9 +149,18 @@ void NFFLoader::parseSphere(std::string s)
 	scene->addMesh(sphere);
 }
 
-void NFFLoader::parsePolygon(std::string s)
+void NFFLoader::parsePolygon(std::string line1, std::string line2, std::string line3)
 {
-	//Do later if needed
+    std::istringstream iss(line1);
+    std::vector<std::string> results((std::istream_iterator<std::string>(iss)), std::istream_iterator<std::string>());
+    std::string::size_type sz;
+    Vector3 p1 = Vector3(std::stof(results[0], &sz), std::stof(results[1], &sz), std::stof(results[2], &sz));
+    std::istringstream iss1(line2);
+    std::vector<std::string> results1((std::istream_iterator<std::string>(iss1)), std::istream_iterator<std::string>());
+    Vector3 p2 = Vector3(std::stof(results1[0], &sz), std::stof(results1[1], &sz), std::stof(results1[2], &sz));
+    std::istringstream iss2(line3);
+    std::vector<std::string> results2((std::istream_iterator<std::string>(iss2)), std::istream_iterator<std::string>());
+    Vector3 p3 = Vector3(std::stof(results2[0], &sz), std::stof(results2[1], &sz), std::stof(results2[2], &sz));
 }
 
 void NFFLoader::parsePolygonalPatch(std::string s)
