@@ -35,7 +35,7 @@ void Camera::setHither(float hit)
 	hither = hit;
 }
 
-void Camera::setResolution(float x, float y)
+void Camera::setResolution(int x, int y)
 {
 	resX = x;
 	resY = y;

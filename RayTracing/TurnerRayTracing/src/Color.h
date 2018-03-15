@@ -13,14 +13,13 @@ struct Color
 			g = green;
 			b = blue;
 		};
-		void operator += (const float s);
 		void operator += (const Color &v);
 		void operator *= (const float s);
 };
 
-Color operator+ (const Color &v, const float &num);
 Color operator+ (const Color &v, const Color &u);
 Color operator* (const Color &v, const float &num);
 Color operator* (const float &num, const Color &v);
+Color operator* (const Color &v, const Color &u);
 
 #endif // !__COLOR_H__

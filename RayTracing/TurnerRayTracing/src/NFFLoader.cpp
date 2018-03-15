@@ -90,7 +90,7 @@ void NFFLoader::parseResolution(std::string s)
 	std::istringstream iss(s);
 	std::vector<std::string> results((std::istream_iterator<std::string>(iss)), std::istream_iterator<std::string>());
 	std::string::size_type sz;
-	camera->setResolution(std::stof(results[1], &sz), std::stof(results[2], &sz));
+	camera->setResolution(std::stoi(results[1], &sz), std::stoi(results[2], &sz));
 }
 
 void NFFLoader::parseBackground(std::string s)
@@ -109,7 +109,7 @@ void NFFLoader::parseLight(std::string s)
 	std::vector<std::string> results((std::istream_iterator<std::string>(iss)), std::istream_iterator<std::string>());
 	std::string::size_type sz;
 	Vector3 pos = Vector3(std::stof(results[1], &sz), std::stof(results[2], &sz), std::stof(results[3], &sz));
-	Color col = Color(std::stof(results[3], &sz), std::stof(results[4], &sz), std::stof(results[5], &sz));
+	Color col = Color(std::stof(results[4], &sz), std::stof(results[5], &sz), std::stof(results[6], &sz));
 	Light *l = new Light(pos, col);
 	scene->addLight(l);
 	//create light and add it to the scene

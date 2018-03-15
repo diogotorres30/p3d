@@ -69,6 +69,7 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 	float t = 0.0f;
 	Mesh *nearestMesh = nullptr;
 	Vector3 intersectionPoint = Vector3(0.0f);
+	Vector3 fixedPoint = Vector3(0.0f), reflected = Vector3(0.0f);
 
 	std::vector<Mesh*> meshes = scene->getMeshes();
 	for (std::vector<Mesh*>::iterator itMesh = meshes.begin(); itMesh != meshes.end(); ++itMesh)
@@ -89,6 +90,7 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 	{
 		ray.intersectionPoint(nearestT);
 
+		//Ambient component
 		color = nearestMesh->getMaterial()->getColor() * nearestMesh->getMaterial()->getKd();
 		Vector3 normal = normalized(nearestMesh->getNormal(ray));
 
@@ -96,11 +98,12 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 		for (std::vector<Light*>::iterator itLight = lights.begin(); itLight != lights.end(); ++itLight)
 		{
 			Vector3 L = normalized((*itLight)->getPosition() - ray.point);
-			float LNormal = dot(L, normal);
+			float LDistance = norm((*itLight)->getPosition() - ray.point);
+			float LNormal = /*std::max(*/dot(normal, L)/*, 0.0f)*/;
 
 			if(LNormal > 0.0f)
 			{
-				Vector3 fixedPoint = ray.point + 0.0001 * L;
+				Vector3 fixedPoint = ray.point + 0.0001f * L;
 				Ray shadowRay = Ray(fixedPoint, L);
 
 				t = 0.0f;
@@ -113,17 +116,20 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 					if (t > 0.0f && t < nearestT)
 					{
 						shadowIntersection = true;
-						break;
+						nearestT = t;
 					}
 				}
 
-				//Vector3 v = normalized(scene->getCamera()->getFrom() - ray.point);
-				Vector3 reflected = 2.0f * dot(ray.direction, normal) * normal - ray.direction;
+				Vector3 v = normalized(scene->getCamera()->getFrom() - ray.point);
+				reflected = 2.0f * dot(v, normal) * normal - v;
 
-				if (shadowIntersection)
+				float attenuation = 1.0 / (1.0f + 0.09f * LDistance + 0.0002f * (LDistance * LDistance));
+				Vector3 halfwayDir = normalized(L + v);
+
+				if ((!shadowIntersection))
 				{
-					Color cd = nearestMesh->getMaterial()->getKd() * (*itLight)->getColor() * dot(normal, L);
-					Color cs = nearestMesh->getMaterial()->getKs() * (*itLight)->getColor() * pow(std::max(0.0f, dot(reflected, L)), nearestMesh->getMaterial()->getShine());
+					Color cd = (*itLight)->getColor() * nearestMesh->getMaterial()->getKd() * nearestMesh->getMaterial()->getColor() * LNormal /** attenuation*/;
+					Color cs = (*itLight)->getColor() * nearestMesh->getMaterial()->getKs() * nearestMesh->getMaterial()->getColor() * pow(std::max(dot(normal, halfwayDir), 0.0f), nearestMesh->getMaterial()->getShine())/* * attenuation*/;
 					color += cd + cs;
 				}
 			}
@@ -134,18 +140,22 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 			return color;
 		}
 
+		if ((1 - nearestMesh->getMaterial()->getT()) > 0.0f)
+		{
+			Ray rRay = Ray(fixedPoint, reflected);
+			Color rColor = rayTracing(rRay, depth + 1, nearestMesh->getMaterial()->getIndex());
+			color += rColor * nearestMesh->getMaterial()->getKs();
+		}
+
+		/*if (nearestMesh->getMaterial()->getT() > 0.0f)
+		{
+			Ray tRay = Ray(fixedPoint, reflected);
+			Color tColor = rayTracing(tRay, depth + 1, nearestMesh->getMaterial()->getIndex());
+			color += tColor * nearestMesh->getMaterial()->getT();
+		}*/
+
 		return color;
 	}
-	//	color = object material’s ambient color;
-	//	compute normal at the hit point;
-	//	for (each source light) {
-	//		L = unit light vector from hit point to light source;
-	//		if (L • normal>0)
-	//			if (!point in shadow); //trace shadow ray
-	//		color += diffuse color + specular color;
-	//	}
-	//	if (depth >= maxDepth) return color;
-
 	//	if (reflective object) {
 	//		rRay = calculate ray in the reflected direction;
 	//		rColor = trace(scene, point, rRay direction, depth + 1);
@@ -159,7 +169,6 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 	//	return color;
 	//}
 
-	//return color;
 }
 
 /////////////////////////////////////////////////////////////////////// ERRORS
@@ -328,8 +337,8 @@ void renderScene()
         {
             
             //YOUR 2 FUNTIONS:
-            Ray ray = Ray(scene->getCamera(),Vector2(x, y));
-            Color color = rayTracing(ray, 1, 1.0);
+            Ray ray = Ray(scene->getCamera(), Vector2(x, y));
+            Color color = rayTracing(ray, 1, 1.0f);
             
             vertices[index_pos++]= (float)x;
             vertices[index_pos++]= (float)y;

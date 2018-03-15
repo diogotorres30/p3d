@@ -19,7 +19,7 @@ public:
 	void setUp(Vector3 u);
 	void setFov(float ang);
 	void setHither(float hit);
-	void setResolution(float x, float y);
+	void setResolution(int x, int y);
 	Vector3 getFrom() { return from; };
 	int getResX() { return resX; };
 	int getResY() { return resY; };
