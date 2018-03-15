@@ -14,6 +14,7 @@
 #include "Mesh.h"
 #include "Sphere.h"
 #include "Plane.h"
+#include "Triangle.h"
 #include "Light.h"
 #include "Camera.h"
 #include "MathAux.h"

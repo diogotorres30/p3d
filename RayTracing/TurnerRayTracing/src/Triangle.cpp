@@ -11,6 +11,11 @@ Triangle::Triangle(Vector3 newp1, Vector3 newp2, Vector3 newp3, Material *mat) :
 
 float Triangle::intersect(Ray &ray) {
 	float t = -1.0;
+    float alpha, beta, gama;
+    
+    if(alpha + beta + gama != 1){
+        //ERROR
+    }
 
 
 	return t;

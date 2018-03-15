@@ -161,6 +161,8 @@ void NFFLoader::parsePolygon(std::string line1, std::string line2, std::string l
     std::istringstream iss2(line3);
     std::vector<std::string> results2((std::istream_iterator<std::string>(iss2)), std::istream_iterator<std::string>());
     Vector3 p3 = Vector3(std::stof(results2[0], &sz), std::stof(results2[1], &sz), std::stof(results2[2], &sz));
+    Triangle *triangle = new Triangle(p1, p2, p3, scene->getMaterials().back());
+    scene->addMesh(triangle);
 }
 
 void NFFLoader::parsePolygonalPatch(std::string s)
