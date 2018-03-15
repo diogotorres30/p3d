@@ -91,7 +91,7 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 		ray.intersectionPoint(nearestT);
 
 		//Ambient component
-		color = nearestMesh->getMaterial()->getColor() * nearestMesh->getMaterial()->getKd();
+		color = /*nearestMesh->getMaterial()->getColor() * nearestMesh->getMaterial()->getKd()*/Color(0.0f, 0.0f, 0.0f);
 		Vector3 normal = normalized(nearestMesh->getNormal(ray));
 
 		std::vector<Light*> lights = scene->getLights();
@@ -99,10 +99,10 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 		{
 			Vector3 L = normalized((*itLight)->getPosition() - ray.point);
 			float LDistance = norm((*itLight)->getPosition() - ray.point);
-			float LNormal = /*std::max(*/dot(normal, L)/*, 0.0f)*/;
+			float LNormal = std::max(dot(normal, L), 0.0f);
 
-			if(LNormal > 0.0f)
-			{
+			//if(LNormal > 0.0f)
+			//{
 				Vector3 fixedPoint = ray.point + 0.0001f * L;
 				Ray shadowRay = Ray(fixedPoint, L);
 
@@ -128,11 +128,12 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 
 				if ((!shadowIntersection))
 				{
+					//Color ca = (*itLight)->getColor() * nearestMesh->getMaterial()->getKd() * nearestMesh->getMaterial()->getColor();
 					Color cd = (*itLight)->getColor() * nearestMesh->getMaterial()->getKd() * nearestMesh->getMaterial()->getColor() * LNormal /** attenuation*/;
-					Color cs = (*itLight)->getColor() * nearestMesh->getMaterial()->getKs() * nearestMesh->getMaterial()->getColor() * pow(std::max(dot(normal, halfwayDir), 0.0f), nearestMesh->getMaterial()->getShine())/* * attenuation*/;
+					Color cs = (*itLight)->getColor() * nearestMesh->getMaterial()->getKs() * nearestMesh->getMaterial()->getColor() * pow(std::max(dot(reflected, L), 0.0f), nearestMesh->getMaterial()->getShine())/* * attenuation*/;
 					color += cd + cs;
 				}
-			}
+			//}
 		}
 
 		if (depth <= MAX_DEPTH)
