@@ -147,12 +147,18 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 
         if (nearestMesh->getMaterial()->getT() > 0.0f)
         {
-            Vector3 vt = dot(v, normal) * normal - v;
+			 Vector3 vt = dot(v, -normal) * -normal - v;
             float sinthetai = norm(vt);
             float sinthetat = (RefrIndex/nearestMesh->getMaterial()->getIndex()) * sinthetai;
             float costhetat = sqrt((1- (sinthetat * sinthetat)));
             Vector3 tHat = (1 / sinthetai) * vt;
-            Vector3 rt = sinthetat * tHat + costhetat * (-normal);
+            Vector3 rt = sinthetat * tHat + costhetat * (normal);
+		/*	Vector3 rt;
+			float n = RefrIndex / nearestMesh->getMaterial()->getIndex();
+			float cosI = dot(normal, v);
+			float sinT2 = n * n * (1.0f - cosI * cosI);
+			float cosT = sqrt(1.0f - sinT2);
+			rt = v * n + (-normal) * (n * cosI - cosT);*/
             Ray tRay = Ray(fixedPoint, rt);
             Color tColor = rayTracing(tRay, depth + 1, nearestMesh->getMaterial()->getIndex());
             color += tColor * nearestMesh->getMaterial()->getT();
@@ -478,7 +484,7 @@ int main(int argc, char* argv[])
     #ifdef __APPLE__
         std::string filename = std::string("test_scene.nff");
     #else
-       std::string filename = std::string("../../RayTracing/TurnerRayTracing/src/nffs/test_scene.nff");
+       std::string filename = std::string("../../RayTracing/TurnerRayTracing/src/nffs/mount_low.nff");
     #endif
 	scene = loader.createScene(filename);
 	scene->getCamera()->calculate();
