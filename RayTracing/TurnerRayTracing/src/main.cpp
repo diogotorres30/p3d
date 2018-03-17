@@ -102,7 +102,7 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 			float LDistance = norm((*itLight)->getPosition() - ray.point);
 			float LNormal = std::max(dot(normal, L), 0.0f);
 
-            fixedPoint = ray.point + 0.0001f;
+            fixedPoint = ray.point + 0.0001f * L;
             Ray shadowRay = Ray(fixedPoint, L);
             t = 0.0f;
             nearestT = 100.0f;
@@ -140,6 +140,7 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
        
 		if ((1.0f - nearestMesh->getMaterial()->getT()) > 0.0f)
 		{
+             fixedPoint = ray.point + 0.0001f;
 			Ray rRay = Ray(fixedPoint, reflected);
 			Color rColor = rayTracing(rRay, depth + 1, nearestMesh->getMaterial()->getIndex());
             color += rColor * nearestMesh->getMaterial()->getKs() * nearestMesh->getMaterial()->getColor() * (1.0f - nearestMesh->getMaterial()->getT());
@@ -147,21 +148,26 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 
         if (nearestMesh->getMaterial()->getT() > 0.0f)
         {
-			 Vector3 vt = dot(v, -normal) * -normal - v;
-            float sinthetai = norm(vt);
-            float sinthetat = (RefrIndex/nearestMesh->getMaterial()->getIndex()) * sinthetai;
-            float costhetat = sqrt((1- (sinthetat * sinthetat)));
-            Vector3 tHat = (1 / sinthetai) * vt;
-            Vector3 rt = sinthetat * tHat + costhetat * (normal);
-		/*	Vector3 rt;
-			float n = RefrIndex / nearestMesh->getMaterial()->getIndex();
-			float cosI = dot(normal, v);
-			float sinT2 = n * n * (1.0f - cosI * cosI);
-			float cosT = sqrt(1.0f - sinT2);
-			rt = v * n + (-normal) * (n * cosI - cosT);*/
+            float cosI = dot(ray.direction, normal);
+            float iorI = RefrIndex;
+            float iorT = nearestMesh->getMaterial()->getIndex();
+
+            if(cosI < 0){
+                cosI = -cosI;
+            }
+            else {
+                std::swap(iorI, iorT);
+                normal = -normal;
+            }
+            float n = iorI/iorT;
+            float k = 1 - n * n * (1 - cosI * cosI);
+            Vector3 rt = ray.direction * n + normal * (n * cosI - sqrt(k));
+            
+            fixedPoint = ray.point + 0.0001f * rt;
             Ray tRay = Ray(fixedPoint, rt);
-            Color tColor = rayTracing(tRay, depth + 1, nearestMesh->getMaterial()->getIndex());
+            Color tColor = rayTracing(tRay, depth + 1, RefrIndex);
             color += tColor * nearestMesh->getMaterial()->getT();
+
         }
 
 		return color;
@@ -482,7 +488,7 @@ int main(int argc, char* argv[])
     //INSERT HERE YOUR CODE FOR PARSING NFF FILES
 	NFFLoader loader = NFFLoader();
     #ifdef __APPLE__
-        std::string filename = std::string("test_scene.nff");
+        std::string filename = std::string("mount_low.nff");
     #else
        std::string filename = std::string("../../RayTracing/TurnerRayTracing/src/nffs/mount_low.nff");
     #endif

@@ -33,12 +33,5 @@ float Sphere::intersect(Ray &ray){
 
 Vector3 Sphere::getNormal(Ray &ray)
 {
-	if (dist2 < (radius*radius))
-	{
-		return Vector3(-(ray.point.x - center.x) / radius, -(ray.point.y - center.y) / radius, -(ray.point.z - center.z) / radius);
-	}
-	else
-	{
-		return Vector3((ray.point.x - center.x) / radius, (ray.point.y - center.y) / radius, (ray.point.z - center.z) / radius);
-	}
+    return Vector3((ray.point.x - center.x) / radius, (ray.point.y - center.y) / radius, (ray.point.z - center.z) / radius);
 }
