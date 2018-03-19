@@ -119,16 +119,15 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
             }
 
             v = normalized(scene->getCamera()->getFrom() - ray.point);
-            reflected = 2.0f * dot(v, normal) * normal - v;
 
             //float attenuation = 1.0 / (1.0f + 0.09f * LDistance + 0.0002f * (LDistance * LDistance));
-            //Vector3 halfwayDir = normalized(L + v);
+            Vector3 halfwayDir = normalized(L + v);
 
             if ((!shadowIntersection))
             {
                 //Color ca = (*itLight)->getColor() * nearestMesh->getMaterial()->getKd() * nearestMesh->getMaterial()->getColor();
                 Color cd = (*itLight)->getColor() * nearestMesh->getMaterial()->getKd() * nearestMesh->getMaterial()->getColor() * LNormal /** attenuation*/;
-                Color cs = (*itLight)->getColor() * nearestMesh->getMaterial()->getKs() * nearestMesh->getMaterial()->getColor() * pow(std::max(dot(reflected, L), 0.0f), nearestMesh->getMaterial()->getShine())/* * attenuation*/;
+                Color cs = (*itLight)->getColor() * nearestMesh->getMaterial()->getKs() * nearestMesh->getMaterial()->getColor() * pow(std::max(dot(normal, halfwayDir), 0.0f), nearestMesh->getMaterial()->getShine())/* * attenuation*/;
                 color += cd + cs;
             }
 		}
@@ -140,10 +139,12 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
        
 		if ((1.0f - nearestMesh->getMaterial()->getT()) > 0.0f)
 		{
-             fixedPoint = ray.point + 0.0001f;
+			reflected = 2.0f * dot(v, normal) * normal - v;
+            fixedPoint = ray.point + 0.0001f * reflected;
+
 			Ray rRay = Ray(fixedPoint, reflected);
-			Color rColor = rayTracing(rRay, depth + 1, nearestMesh->getMaterial()->getIndex());
-            color += rColor * nearestMesh->getMaterial()->getKs() * nearestMesh->getMaterial()->getColor() * (1.0f - nearestMesh->getMaterial()->getT());
+			Color rColor = rayTracing(rRay, depth + 1, RefrIndex);
+            color += rColor * nearestMesh->getMaterial()->getKs() /** nearestMesh->getMaterial()->getColor() * (1.0f - nearestMesh->getMaterial()->getT())*/;
 		}
 
         if (nearestMesh->getMaterial()->getT() > 0.0f)
@@ -172,19 +173,6 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 
 		return color;
 	}
-	//	if (reflective object) {
-	//		rRay = calculate ray in the reflected direction;
-	//		rColor = trace(scene, point, rRay direction, depth + 1);
-	//		reduce rColor by the specular reflection coefficient and add to color;
-	//	}
-	//	if (translucid object) {
-	//		tRay = calculate ray in the refracted direction;
-	//		tColor = trace(scene, point, tRay direction, depth + 1);
-	//		reduce tColor by the transmittance coefficient and add to color;
-	//	}
-	//	return color;
-	//}
-
 }
 
 /////////////////////////////////////////////////////////////////////// ERRORS
@@ -490,7 +478,7 @@ int main(int argc, char* argv[])
     #ifdef __APPLE__
         std::string filename = std::string("mount_low.nff");
     #else
-       std::string filename = std::string("../../RayTracing/TurnerRayTracing/src/nffs/mount_low.nff");
+       std::string filename = std::string("../../RayTracing/TurnerRayTracing/src/nffs/balls_low.nff");
     #endif
 	scene = loader.createScene(filename);
 	scene->getCamera()->calculate();

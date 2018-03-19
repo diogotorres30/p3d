@@ -20,3 +20,5 @@ bin/x64/*.pdb
 
 RayTracing/TurnerRayTracing/src/P3D_Project.xcodeproj/
 /RayTracing/TurnerRayTracing/src/NFFParser.cpp
+/Bin/x64/TurnerRayTracing.ipdb
+/Bin/x64/TurnerRayTracing.iobj
