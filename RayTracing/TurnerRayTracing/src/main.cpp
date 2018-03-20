@@ -73,6 +73,7 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 	//variable to hold a pointer to the object that was intersected the closest to the origin
 	Mesh *nearestMesh = nullptr;
 	Vector3 fixedPoint = Vector3(0.0f);
+	Vector3 reflected;
 
 	//loop for intersection of the ray with every object in the scene
 	std::vector<Mesh*> meshes = scene->getMeshes();
@@ -108,40 +109,45 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 			float LNormal = std::max(dot(normal, L), 0.0f);
 
 			//Fixed point for ray in the light direction
-            fixedPoint = ray.point + 0.0001f * L;
+			fixedPoint = ray.point + 0.0001f * L;
 			//create shadow ray
-            Ray shadowRay = Ray(fixedPoint, L);
-            t = 0.0f;
-            nearestT = 100.0f;
-            bool shadowIntersection = false;
+			Ray shadowRay = Ray(fixedPoint, L);
+			t = 0.0f;
+			nearestT = 100.0f;
+			bool shadowIntersection = false;
 
-            for (std::vector<Mesh*>::iterator itMesh = meshes.begin(); itMesh != meshes.end(); ++itMesh)
-            {
-                t = (*itMesh)->intersect(shadowRay);
-                if (t > 0.0f && t < nearestT)
-                {
-                    shadowIntersection = true;
-                    nearestT = t;
-                }
-            }
+			for (std::vector<Mesh*>::iterator itMesh = meshes.begin(); itMesh != meshes.end(); ++itMesh)
+			{
+				t = (*itMesh)->intersect(shadowRay);
+				if (t > 0.0f && t < LDistance)
+				{
+					shadowIntersection = true;
+					nearestT = t;
+				}
+			}
 
-            Vector3 v = normalized(scene->getCamera()->getFrom() - ray.point);
+			//Calculate the reflected direction
+			reflected = normalized(2.0f * dot((-ray.direction), normal) * normal - (-ray.direction));
+
+			//Vector3 v = normalized(scene->getCamera()->getFrom() - ray.point);
 
 			//attenuation function considering the direction to each light
 			//float attenuation = 1.0 / (1.0f + 0.09f * LDistance + 0.0002f * (LDistance * LDistance));
-            Vector3 halfwayDir = normalized(L + v);
 
-            if ((!shadowIntersection))
-            {
-                //Color ca = (*itLight)->getColor() * nearestMesh->getMaterial()->getKd() * nearestMesh->getMaterial()->getColor();
+			//halfway vector creates too bright colors
+			//Vector3 halfwayDir = normalized(L + normalized(-ray.direction));
 
+			if ((!shadowIntersection) && LNormal > 0.0f)
+			{
+				//ambient component, not used
+				//Color ca = (*itLight)->getColor() * nearestMesh->getMaterial()->getKd() * nearestMesh->getMaterial()->getColor();
 				//diffuse component
-                Color cd = (*itLight)->getColor() * nearestMesh->getMaterial()->getKd() * nearestMesh->getMaterial()->getColor() * LNormal/* * attenuation*/;
+				Color cd = (*itLight)->getColor() * nearestMesh->getMaterial()->getKd() * nearestMesh->getMaterial()->getColor() * LNormal/* * attenuation*/;
 				//specular component
-                Color cs = (*itLight)->getColor() * nearestMesh->getMaterial()->getKs() * nearestMesh->getMaterial()->getColor() * pow(std::max(dot(normal, halfwayDir), 0.0f), nearestMesh->getMaterial()->getShine()) /** attenuation*/;
+				Color cs = (*itLight)->getColor() * nearestMesh->getMaterial()->getKs() * nearestMesh->getMaterial()->getColor() * pow(std::max(dot(reflected, (-ray.direction)), 0.0f), nearestMesh->getMaterial()->getShine()) /** attenuation*/;
 				//add each component of the light according to Blinn-Phong
-                color += cd + cs;
-            }
+				color += cd + cs;
+			}
 		}
 
 		if (depth >= MAX_DEPTH)
@@ -152,8 +158,6 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 		//Reflection
 		if ((1.0f - nearestMesh->getMaterial()->getT()) > 0.0f)
 		{
-			//Calculate the reflected direction
-			Vector3 reflected = 2.0f * dot((-ray.direction), normal) * normal - (-ray.direction);
 			//Fixed point for reflection
             fixedPoint = ray.point + 0.0001f * reflected;
 			//create reflected ray
@@ -182,7 +186,7 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
             float n = iorI/iorT;
             float k = 1 - n * n * (1 - cosI * cosI);
 			//Calculate the refracted direction
-            Vector3 rt = ray.direction * n + normal * (n * cosI - sqrt(k));
+            Vector3 rt = normalized(ray.direction * n + normal * (n * cosI - sqrt(k)));
 			//Fixed point for refraction
             fixedPoint = ray.point + 0.0001f * rt;
 			//create refracted ray
@@ -193,7 +197,6 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
             color += tColor * nearestMesh->getMaterial()->getT();
 
         }
-
 		return color;
 	}
 }
@@ -500,7 +503,7 @@ int main(int argc, char* argv[])
     #ifdef __APPLE__
         std::string filename = std::string("mount_low.nff");
     #else
-       std::string filename = std::string("../../RayTracing/TurnerRayTracing/src/nffs/balls_high.nff");
+       std::string filename = std::string("../../RayTracing/TurnerRayTracing/src/nffs/mount_high.nff");
     #endif
 	scene = loader.createScene(filename);
 	scene->getCamera()->calculate();
