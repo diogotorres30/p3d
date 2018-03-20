@@ -64,14 +64,17 @@ int WindowHandle = 0;
 
 Color rayTracing(Ray ray, int depth, float RefrIndex)
 {
+	//variable to hold the color of the pixel
 	Color color;
+	//variable to hold the nearest t where an object was intersected 
 	float nearestT = 100.0f;
+	//variable to hold the current t
 	float t = 0.0f;
+	//variable to hold a pointer to the object that was intersected the closest to the origin
 	Mesh *nearestMesh = nullptr;
-	Vector3 intersectionPoint = Vector3(0.0f);
-	Vector3 fixedPoint = Vector3(0.0f), reflected = Vector3(0.0f);
-    Vector3 v = Vector3(0.0f);
+	Vector3 fixedPoint = Vector3(0.0f);
 
+	//loop for intersection of the ray with every object in the scene
 	std::vector<Mesh*> meshes = scene->getMeshes();
 	for (std::vector<Mesh*>::iterator itMesh = meshes.begin(); itMesh != meshes.end(); ++itMesh)
 	{
@@ -89,11 +92,13 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 	}
 	else
 	{
+		//calculate the intersection point to use for the secondary rays
 		ray.intersectionPoint(nearestT);
 
 		//Ambient component
 		color = /*nearestMesh->getMaterial()->getColor() * nearestMesh->getMaterial()->getKd()*/Color(0.0f, 0.0f, 0.0f);
 		Vector3 normal = normalized(nearestMesh->getNormal(ray));
+
 
 		std::vector<Light*> lights = scene->getLights();
 		for (std::vector<Light*>::iterator itLight = lights.begin(); itLight != lights.end(); ++itLight)
@@ -102,7 +107,9 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 			float LDistance = norm((*itLight)->getPosition() - ray.point);
 			float LNormal = std::max(dot(normal, L), 0.0f);
 
+			//Fixed point for ray in the light direction
             fixedPoint = ray.point + 0.0001f * L;
+			//create shadow ray
             Ray shadowRay = Ray(fixedPoint, L);
             t = 0.0f;
             nearestT = 100.0f;
@@ -118,16 +125,21 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
                 }
             }
 
-            v = normalized(scene->getCamera()->getFrom() - ray.point);
+            Vector3 v = normalized(scene->getCamera()->getFrom() - ray.point);
 
-            //float attenuation = 1.0 / (1.0f + 0.09f * LDistance + 0.0002f * (LDistance * LDistance));
+			//attenuation function considering the direction to each light
+			//float attenuation = 1.0 / (1.0f + 0.09f * LDistance + 0.0002f * (LDistance * LDistance));
             Vector3 halfwayDir = normalized(L + v);
 
             if ((!shadowIntersection))
             {
                 //Color ca = (*itLight)->getColor() * nearestMesh->getMaterial()->getKd() * nearestMesh->getMaterial()->getColor();
-                Color cd = (*itLight)->getColor() * nearestMesh->getMaterial()->getKd() * nearestMesh->getMaterial()->getColor() * LNormal /** attenuation*/;
-                Color cs = (*itLight)->getColor() * nearestMesh->getMaterial()->getKs() * nearestMesh->getMaterial()->getColor() * pow(std::max(dot(normal, halfwayDir), 0.0f), nearestMesh->getMaterial()->getShine())/* * attenuation*/;
+
+				//diffuse component
+                Color cd = (*itLight)->getColor() * nearestMesh->getMaterial()->getKd() * nearestMesh->getMaterial()->getColor() * LNormal/* * attenuation*/;
+				//specular component
+                Color cs = (*itLight)->getColor() * nearestMesh->getMaterial()->getKs() * nearestMesh->getMaterial()->getColor() * pow(std::max(dot(normal, halfwayDir), 0.0f), nearestMesh->getMaterial()->getShine()) /** attenuation*/;
+				//add each component of the light according to Blinn-Phong
                 color += cd + cs;
             }
 		}
@@ -137,22 +149,29 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 			return color;
 		}
        
+		//Reflection
 		if ((1.0f - nearestMesh->getMaterial()->getT()) > 0.0f)
 		{
-			reflected = 2.0f * dot(v, normal) * normal - v;
+			//Calculate the reflected direction
+			Vector3 reflected = 2.0f * dot((-ray.direction), normal) * normal - (-ray.direction);
+			//Fixed point for reflection
             fixedPoint = ray.point + 0.0001f * reflected;
-
+			//create reflected ray
 			Ray rRay = Ray(fixedPoint, reflected);
+			//shoot reflected ray
 			Color rColor = rayTracing(rRay, depth + 1, RefrIndex);
-            color += rColor * nearestMesh->getMaterial()->getKs() /** nearestMesh->getMaterial()->getColor() * (1.0f - nearestMesh->getMaterial()->getT())*/;
+			//add reflection color to the pixel color
+            color += rColor * nearestMesh->getMaterial()->getKs() /** (1.0f - nearestMesh->getMaterial()->getT())*/;
 		}
 
+		//Refraction
         if (nearestMesh->getMaterial()->getT() > 0.0f)
         {
             float cosI = dot(ray.direction, normal);
             float iorI = RefrIndex;
             float iorT = nearestMesh->getMaterial()->getIndex();
 
+			//decide the case where we are inside or outside of the object
             if(cosI < 0){
                 cosI = -cosI;
             }
@@ -162,11 +181,15 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
             }
             float n = iorI/iorT;
             float k = 1 - n * n * (1 - cosI * cosI);
+			//Calculate the refracted direction
             Vector3 rt = ray.direction * n + normal * (n * cosI - sqrt(k));
-            
+			//Fixed point for refraction
             fixedPoint = ray.point + 0.0001f * rt;
+			//create refracted ray
             Ray tRay = Ray(fixedPoint, rt);
+			//shoot refracted ray
             Color tColor = rayTracing(tRay, depth + 1, RefrIndex);
+			//add refraction color to the pixel color
             color += tColor * nearestMesh->getMaterial()->getT();
 
         }
@@ -339,7 +362,6 @@ void renderScene()
     {
         for (int x = 0; x < RES_X; x++)
         {
-            
             //YOUR 2 FUNTIONS:
             Ray ray = Ray(scene->getCamera(), Vector2(x, y));
             Color color = rayTracing(ray, 1, 1.0f);
@@ -478,14 +500,11 @@ int main(int argc, char* argv[])
     #ifdef __APPLE__
         std::string filename = std::string("mount_low.nff");
     #else
-       std::string filename = std::string("../../RayTracing/TurnerRayTracing/src/nffs/balls_low.nff");
+       std::string filename = std::string("../../RayTracing/TurnerRayTracing/src/nffs/balls_high.nff");
     #endif
 	scene = loader.createScene(filename);
 	scene->getCamera()->calculate();
 
-	//scene = new Scene();
-	//std::string filename = std::string("jap.nff");
-	//if(!(scene->load_nff(filename))) return 0;
     RES_X = scene->getCamera()->getResX();
     RES_Y = scene->getCamera()->getResY();
     
