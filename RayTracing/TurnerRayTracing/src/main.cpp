@@ -365,6 +365,9 @@ void renderScene()
     {
         for (int x = 0; x < RES_X; x++)
         {
+
+			//TODO: create multiple rays for various parts of the pixel
+
             //YOUR 2 FUNTIONS:
             Ray ray = Ray(scene->getCamera(), Vector2(x, y));
             Color color = rayTracing(ray, 1, 1.0f);
