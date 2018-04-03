@@ -119,7 +119,7 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 			for (std::vector<Mesh*>::iterator itMesh = meshes.begin(); itMesh != meshes.end(); ++itMesh)
 			{
 				t = (*itMesh)->intersect(shadowRay);
-				if (t > 0.0f && t < LDistance)
+				if (t > 0.0f && t < nearestT)
 				{
 					shadowIntersection = true;
 					nearestT = t;
@@ -135,7 +135,7 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 			//float attenuation = 1.0 / (1.0f + 0.09f * LDistance + 0.0002f * (LDistance * LDistance));
 
 			//halfway vector creates too bright colors
-			//Vector3 halfwayDir = normalized(L + normalized(-ray.direction));
+			Vector3 halfwayDir = normalized(L + normalized(-ray.direction));
 
 			if ((!shadowIntersection) && LNormal > 0.0f)
 			{
@@ -143,8 +143,10 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 				//Color ca = (*itLight)->getColor() * nearestMesh->getMaterial()->getKd() * nearestMesh->getMaterial()->getColor();
 				//diffuse component
 				Color cd = (*itLight)->getColor() * nearestMesh->getMaterial()->getKd() * nearestMesh->getMaterial()->getColor() * LNormal/* * attenuation*/;
-				//specular component
-				Color cs = (*itLight)->getColor() * nearestMesh->getMaterial()->getKs() * nearestMesh->getMaterial()->getColor() * pow(std::max(dot(reflected, (-ray.direction)), 0.0f), nearestMesh->getMaterial()->getShine()) /** attenuation*/;
+				//specular component with halfway direction
+				Color cs = (*itLight)->getColor() * nearestMesh->getMaterial()->getKs() * nearestMesh->getMaterial()->getColor() * pow(std::max(dot(normal, halfwayDir), 0.0f), nearestMesh->getMaterial()->getShine()) /** attenuation*/;
+				//specular component with reflected vector
+				//Color cs = (*itLight)->getColor() * nearestMesh->getMaterial()->getKs() * nearestMesh->getMaterial()->getColor() * pow(std::max(dot(reflected, (-ray.direction)), 0.0f), nearestMesh->getMaterial()->getShine()) /** attenuation*/;
 				//add each component of the light according to Blinn-Phong
 				color += cd + cs;
 			}
@@ -398,6 +400,11 @@ void renderScene()
     printf("Terminou!\n");
 }
 
+void keysPressed(unsigned char key, int x, int y)
+{
+	//TODO: Add keys to turn on and off effects
+}
+
 void cleanup()
 {
     destroyShaderProgram();
@@ -441,6 +448,8 @@ void setupCallbacks()
     #endif
     glutDisplayFunc(renderScene);
     glutReshapeFunc(reshape);
+	//Keyboard Functions
+	glutKeyboardFunc(keysPressed);
 }
 
 void setupGLEW() {
@@ -506,7 +515,7 @@ int main(int argc, char* argv[])
     #ifdef __APPLE__
         std::string filename = std::string("mount_low.nff");
     #else
-       std::string filename = std::string("../../RayTracing/TurnerRayTracing/src/nffs/mount_high.nff");
+       std::string filename = std::string("../../RayTracing/TurnerRayTracing/src/nffs/mount_low.nff");
     #endif
 	scene = loader.createScene(filename);
 	scene->getCamera()->calculate();
