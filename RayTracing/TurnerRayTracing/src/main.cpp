@@ -16,6 +16,7 @@
 #include <string>
 #include <stdio.h>
 #include <algorithm>  
+#include <random>
 
 #include <GL/glew.h>
 #ifdef __APPLE__
@@ -35,6 +36,7 @@
 #define COLOR_ATTRIB 1
 
 #define MAX_DEPTH 6
+#define SAMPLE_NUMBER 16
 
 // Points defined by 2 attributes: positions which are stored in vertices array and colors which are stored in colors array
 float *colors;
@@ -59,6 +61,14 @@ int RES_Y;
 int draw_mode=1;
 
 int WindowHandle = 0;
+
+//buffer to keep each keyboard key
+bool keyBuffer[256];
+
+//random generator
+std::random_device rd;  //Will be used to obtain a seed for the random number engine
+std::mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
+std::uniform_real_distribution<> dis(0.0, 1.0);
 
 ///////////////////////////////////////////////////////////////////////  RAY-TRACE SCENE
 
@@ -100,57 +110,128 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 		color = /*nearestMesh->getMaterial()->getColor() * nearestMesh->getMaterial()->getKd()*/Color(0.0f, 0.0f, 0.0f);
 		Vector3 normal = normalized(nearestMesh->getNormal(ray));
 
-
+		float epsilonOne, epsilonTwo;
 		std::vector<Light*> lights = scene->getLights();
 		for (std::vector<Light*>::iterator itLight = lights.begin(); itLight != lights.end(); ++itLight)
 		{
-			Vector3 L = normalized((*itLight)->getPosition() - ray.point);
-			float LDistance = norm((*itLight)->getPosition() - ray.point);
-			float LNormal = std::max(dot(normal, L), 0.0f);
-
-			//Fixed point for ray in the light direction
-			fixedPoint = ray.point + 0.0001f * L;
-			//create shadow ray
-			Ray shadowRay = Ray(fixedPoint, L);
-			t = 0.0f;
-			nearestT = 100.0f;
-			bool shadowIntersection = false;
-
-			for (std::vector<Mesh*>::iterator itMesh = meshes.begin(); itMesh != meshes.end(); ++itMesh)
+			// With soft Shadows
+			if (keyBuffer['S'] || keyBuffer['s'])
 			{
-				t = (*itMesh)->intersect(shadowRay);
-				if (t > 0.0f && t < nearestT)
+				Vector3 positionInLight;
+
+				for (int p = 0; p < SAMPLE_NUMBER; p++)
 				{
-					shadowIntersection = true;
-					nearestT = t;
+					for (int q = 0; q < SAMPLE_NUMBER; q++)
+					{
+						epsilonOne = dis(gen);
+						epsilonTwo = dis(gen);
+						
+						positionInLight.x = (*itLight)->getPosition().x + (p + epsilonOne) / SAMPLE_NUMBER;
+						positionInLight.y = (*itLight)->getPosition().y + (q + epsilonTwo) / SAMPLE_NUMBER;
+						positionInLight.z = (*itLight)->getPosition().z;
+
+						Vector3 L = normalized(positionInLight - ray.point);
+						float LDistance = norm(positionInLight - ray.point);
+						float LNormal = std::max(dot(normal, L), 0.0f);
+
+						//Fixed point for ray in the light direction
+						fixedPoint = ray.point + 0.0001f * L;
+						//create shadow ray
+						Ray shadowRay = Ray(fixedPoint, L);
+						t = 0.0f;
+						nearestT = 100.0f;
+						bool shadowIntersection = false;
+
+						for (std::vector<Mesh*>::iterator itMesh = meshes.begin(); itMesh != meshes.end(); ++itMesh)
+						{
+							t = (*itMesh)->intersect(shadowRay);
+							if (t > 0.0f && t < nearestT)
+							{
+								shadowIntersection = true;
+								nearestT = t;
+							}
+						}
+
+						//Calculate the reflected direction
+						reflected = normalized(2.0f * dot((-ray.direction), normal) * normal - (-ray.direction));
+
+						//Vector3 v = normalized(scene->getCamera()->getFrom() - ray.point);
+
+						//attenuation function considering the direction to each light
+						float attenuation = 1.0 / (1.0f + 0.09f * LDistance + 0.0002f * (LDistance * LDistance));
+
+						//halfway vector creates too bright colors
+						Vector3 halfwayDir = normalized(L + (-ray.direction));
+
+						if ((!shadowIntersection) && LNormal > 0.0f)
+						{
+							//ambient component, not used
+							//Color ca = (*itLight)->getColor() * nearestMesh->getMaterial()->getKd() * nearestMesh->getMaterial()->getColor();
+							//diffuse component
+							Color cd = (*itLight)->getColor() * nearestMesh->getMaterial()->getKd() * nearestMesh->getMaterial()->getColor() * LNormal/* * attenuation*/;
+							//specular component with halfway direction
+							float specular = std::max(dot(halfwayDir, normal), 0.0f);
+							//added attenuation to improve results
+							Color cs = (*itLight)->getColor() * nearestMesh->getMaterial()->getKs() * nearestMesh->getMaterial()->getColor() * pow(specular, nearestMesh->getMaterial()->getShine()) * attenuation;
+							//specular component with reflected vector
+							//Color cs = (*itLight)->getColor() * nearestMesh->getMaterial()->getKs() * nearestMesh->getMaterial()->getColor() * pow(std::max(dot(reflected, (-ray.direction)), 0.0f), nearestMesh->getMaterial()->getShine()) /** attenuation*/;
+							//add each component of the light according to Blinn-Phong
+							color += (cd + cs) / (SAMPLE_NUMBER*SAMPLE_NUMBER);
+						}
+					}
 				}
 			}
-
-			//Calculate the reflected direction
-			reflected = normalized(2.0f * dot((-ray.direction), normal) * normal - (-ray.direction));
-
-			//Vector3 v = normalized(scene->getCamera()->getFrom() - ray.point);
-
-			//attenuation function considering the direction to each light
-			float attenuation = 1.0 / (1.0f + 0.09f * LDistance + 0.0002f * (LDistance * LDistance));
-
-			//halfway vector creates too bright colors
-			Vector3 halfwayDir = normalized(L + (-ray.direction));
-
-			if ((!shadowIntersection) && LNormal > 0.0f)
+			// with hard shadows
+			else
 			{
-				//ambient component, not used
-				//Color ca = (*itLight)->getColor() * nearestMesh->getMaterial()->getKd() * nearestMesh->getMaterial()->getColor();
-				//diffuse component
-				Color cd = (*itLight)->getColor() * nearestMesh->getMaterial()->getKd() * nearestMesh->getMaterial()->getColor() * LNormal/* * attenuation*/;
-				//specular component with halfway direction
-				float specular = std::max(dot(halfwayDir, normal), 0.0f);
-				//added attenuation to improve results
-				Color cs = (*itLight)->getColor() * nearestMesh->getMaterial()->getKs() * nearestMesh->getMaterial()->getColor() * pow(specular, nearestMesh->getMaterial()->getShine()) * attenuation;
-				//specular component with reflected vector
-				//Color cs = (*itLight)->getColor() * nearestMesh->getMaterial()->getKs() * nearestMesh->getMaterial()->getColor() * pow(std::max(dot(reflected, (-ray.direction)), 0.0f), nearestMesh->getMaterial()->getShine()) /** attenuation*/;
-				//add each component of the light according to Blinn-Phong
-				color += cd + cs;
+				Vector3 L = normalized((*itLight)->getPosition() - ray.point);
+				float LDistance = norm((*itLight)->getPosition() - ray.point);
+				float LNormal = std::max(dot(normal, L), 0.0f);
+
+				//Fixed point for ray in the light direction
+				fixedPoint = ray.point + 0.0001f * L;
+				//create shadow ray
+				Ray shadowRay = Ray(fixedPoint, L);
+				t = 0.0f;
+				nearestT = 100.0f;
+				bool shadowIntersection = false;
+
+				for (std::vector<Mesh*>::iterator itMesh = meshes.begin(); itMesh != meshes.end(); ++itMesh)
+				{
+					t = (*itMesh)->intersect(shadowRay);
+					if (t > 0.0f && t < nearestT)
+					{
+						shadowIntersection = true;
+						nearestT = t;
+					}
+				}
+
+				//Calculate the reflected direction
+				reflected = normalized(2.0f * dot((-ray.direction), normal) * normal - (-ray.direction));
+
+				//Vector3 v = normalized(scene->getCamera()->getFrom() - ray.point);
+
+				//attenuation function considering the direction to each light
+				float attenuation = 1.0 / (1.0f + 0.09f * LDistance + 0.0002f * (LDistance * LDistance));
+
+				//halfway vector creates too bright colors
+				Vector3 halfwayDir = normalized(L + (-ray.direction));
+
+				if ((!shadowIntersection) && LNormal > 0.0f)
+				{
+					//ambient component, not used
+					//Color ca = (*itLight)->getColor() * nearestMesh->getMaterial()->getKd() * nearestMesh->getMaterial()->getColor();
+					//diffuse component
+					Color cd = (*itLight)->getColor() * nearestMesh->getMaterial()->getKd() * nearestMesh->getMaterial()->getColor() * LNormal/* * attenuation*/;
+					//specular component with halfway direction
+					float specular = std::max(dot(halfwayDir, normal), 0.0f);
+					//added attenuation to improve results
+					Color cs = (*itLight)->getColor() * nearestMesh->getMaterial()->getKs() * nearestMesh->getMaterial()->getColor() * pow(specular, nearestMesh->getMaterial()->getShine()) * attenuation;
+					//specular component with reflected vector
+					//Color cs = (*itLight)->getColor() * nearestMesh->getMaterial()->getKs() * nearestMesh->getMaterial()->getColor() * pow(std::max(dot(reflected, (-ray.direction)), 0.0f), nearestMesh->getMaterial()->getShine()) /** attenuation*/;
+					//add each component of the light according to Blinn-Phong
+					color += cd + cs;
+				}
 			}
 		}
 
@@ -364,17 +445,37 @@ void renderScene()
 {
     int index_pos=0;
     int index_col=0;
-    
+	Ray ray;
+	Color color;
+	float epsilon;
+
     for (int y = 0; y < RES_Y; y++)
     {
         for (int x = 0; x < RES_X; x++)
         {
 
 			//TODO: create multiple rays for various parts of the pixel
+			if (keyBuffer['A'] || keyBuffer['a'])
+			{
+				for (int p = 0; p < SAMPLE_NUMBER; p++)
+				{
+					for (int q = 0; q < SAMPLE_NUMBER; q++)
+					{
+						epsilon = dis(gen);
+						ray = Ray(scene->getCamera(), Vector2(x + (p + epsilon)/ SAMPLE_NUMBER, y + (q + epsilon)/ SAMPLE_NUMBER));
+						color += rayTracing(ray, 1, 1.0f);
+					}
+				}
 
-            //YOUR 2 FUNTIONS:
-            Ray ray = Ray(scene->getCamera(), Vector2(x, y));
-            Color color = rayTracing(ray, 1, 1.0f);
+				color = color / (SAMPLE_NUMBER*SAMPLE_NUMBER);
+			}
+			else
+			{
+				//YOUR 2 FUNTIONS:
+				ray = Ray(scene->getCamera(), Vector2(x, y));
+				color = rayTracing(ray, 1, 1.0f);
+			}
+           
             
             vertices[index_pos++]= (float)x;
             vertices[index_pos++]= (float)y;
@@ -404,7 +505,17 @@ void renderScene()
 
 void keysPressed(unsigned char key, int x, int y)
 {
-	//TODO: Add keys to turn on and off effects
+	/* 
+		Anti-Aliasing On/Off - key A || a
+		Soft Shadows On/Off - key S || s
+		Uniform Grid On/Off - key G || g
+		Depth of Field On/Off - key D || d 
+	*/
+	if(keyBuffer[key])
+		keyBuffer[key] = false;
+	else
+		keyBuffer[key] = true;
+	glutPostRedisplay();
 }
 
 void cleanup()
@@ -450,6 +561,7 @@ void setupCallbacks()
     #endif
     glutDisplayFunc(renderScene);
     glutReshapeFunc(reshape);
+
 	//Keyboard Functions
 	glutKeyboardFunc(keysPressed);
 }
@@ -517,7 +629,7 @@ int main(int argc, char* argv[])
     #ifdef __APPLE__
         std::string filename = std::string("mount_low.nff");
     #else
-       std::string filename = std::string("../../RayTracing/TurnerRayTracing/src/nffs/balls_medium.nff");
+       std::string filename = std::string("../../RayTracing/TurnerRayTracing/src/nffs/ball.nff");
     #endif
 	scene = loader.createScene(filename);
 	scene->getCamera()->calculate();
