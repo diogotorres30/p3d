@@ -454,7 +454,9 @@ void renderScene()
         for (int x = 0; x < RES_X; x++)
         {
 
-			//TODO: create multiple rays for various parts of the pixel
+			//TODO: create lens for depth of field
+
+
 			if (keyBuffer['A'] || keyBuffer['a'])
 			{
 				for (int p = 0; p < SAMPLE_NUMBER; p++)
