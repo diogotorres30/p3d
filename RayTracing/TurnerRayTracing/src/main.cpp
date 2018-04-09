@@ -447,15 +447,12 @@ void renderScene()
     int index_col=0;
 	Ray ray;
 	Color color;
-	float epsilon;
+	float epsilon = 0.0f;
 
     for (int y = 0; y < RES_Y; y++)
     {
         for (int x = 0; x < RES_X; x++)
         {
-
-			//TODO: create lens for depth of field
-
 
 			if (keyBuffer['A'] || keyBuffer['a'])
 			{
@@ -464,7 +461,10 @@ void renderScene()
 					for (int q = 0; q < SAMPLE_NUMBER; q++)
 					{
 						epsilon = dis(gen);
-						ray = Ray(scene->getCamera(), Vector2(x + (p + epsilon)/ SAMPLE_NUMBER, y + (q + epsilon)/ SAMPLE_NUMBER));
+						float randomX = x + (p + epsilon) / SAMPLE_NUMBER;
+						float randomY = y + (q + epsilon) / SAMPLE_NUMBER;
+						ray = Ray(scene->getCamera(), Vector2(randomX, randomY));
+
 						color += rayTracing(ray, 1, 1.0f);
 					}
 				}
@@ -476,6 +476,36 @@ void renderScene()
 				//YOUR 2 FUNTIONS:
 				ray = Ray(scene->getCamera(), Vector2(x, y));
 				color = rayTracing(ray, 1, 1.0f);
+				if (keyBuffer['D'] || keyBuffer['d'])
+				{
+					Ray raytoo;
+					float ti = (0.5 - ray.origin.z) / ray.direction.z;
+					Vector3 dir = Vector3(ray.origin.x + ray.direction.x * ti, ray.origin.y + ray.direction.y * ti, -0.5);
+
+					for (int i = 0; i <5; i++)
+					{
+						float radius = sqrt(dis(gen));
+						float theta = 2 * 3.14 * dis(gen);
+
+						float lsx = radius * cos(theta) + scene->getCamera()->getFrom().x;
+						float lsy = radius * sin(theta) + scene->getCamera()->getFrom().y;
+						Vector3 orig/*ray.origin*/ = Vector3(lsx, lsy, scene->getCamera()->getFrom().z);
+
+						/*px = x * (1 / scene->getCamera()->getDf());
+						py = y * (1 / scene->getCamera()->getDf());*/
+						/*ray.direction = (px - lsx)*scene->getCamera()->getXe() + (py - lsy)*scene->getCamera()->getXe() - (1)*scene->getCamera()->getZe();*/
+
+						raytoo = Ray(orig, dir);
+
+						color += rayTracing(raytoo, 1, 1.0f);
+					}
+					color /= 5;
+				}
+				else
+				{
+					color = rayTracing(ray, 1, 1.0f);
+				}
+
 			}
            
             
@@ -631,7 +661,7 @@ int main(int argc, char* argv[])
     #ifdef __APPLE__
         std::string filename = std::string("mount_low.nff");
     #else
-       std::string filename = std::string("../../RayTracing/TurnerRayTracing/src/nffs/ball.nff");
+       std::string filename = std::string("../../RayTracing/TurnerRayTracing/src/nffs/ball_depth.nff");
     #endif
 	scene = loader.createScene(filename);
 	scene->getCamera()->calculate();

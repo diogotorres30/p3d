@@ -21,6 +21,7 @@ public:
 	void setHither(float hit);
 	void setResolution(int x, int y);
 	Vector3 getFrom() { return from; };
+	float getHither() { return hither; };
 	int getResX() { return resX; };
 	int getResY() { return resY; };
 	Vector3 getXe() { return xe; };
