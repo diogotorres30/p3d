@@ -480,9 +480,9 @@ void renderScene()
 				{
 					Ray raytoo;
 					float ti = (0.5 - ray.origin.z) / ray.direction.z;
-					Vector3 dir = Vector3(ray.origin.x + ray.direction.x * ti, ray.origin.y + ray.direction.y * ti, -0.5);
+					Vector3 dir = Vector3(-ray.origin.x + ray.direction.x * ti, -ray.origin.y + ray.direction.y * ti, -0.5);
 
-					for (int i = 0; i <5; i++)
+					for (int i = 0; i < 5; i++)
 					{
 						float radius = sqrt(dis(gen));
 						float theta = 2 * 3.14 * dis(gen);
@@ -659,7 +659,7 @@ int main(int argc, char* argv[])
     //INSERT HERE YOUR CODE FOR PARSING NFF FILES
 	NFFLoader loader = NFFLoader();
     #ifdef __APPLE__
-        std::string filename = std::string("mount_low.nff");
+        std::string filename = std::string("ball.nff");
     #else
        std::string filename = std::string("../../RayTracing/TurnerRayTracing/src/nffs/ball_depth.nff");
     #endif
