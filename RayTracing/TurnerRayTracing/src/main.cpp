@@ -72,6 +72,54 @@ std::uniform_real_distribution<> dis(0.0, 1.0);
 
 ///////////////////////////////////////////////////////////////////////  RAY-TRACE SCENE
 
+Mesh* iterateObjects(Ray ray, float &nearestT)
+{
+	//float nearestT = 100.0f;
+	float t = 0.0f;
+	Mesh *nearestMesh = nullptr;
+
+	std::vector<Mesh*> meshes = scene->getMeshes();
+	for (std::vector<Mesh*>::iterator itMesh = meshes.begin(); itMesh != meshes.end(); ++itMesh)
+	{
+		//Objects with Bounding Box mode
+		if (keyBuffer['B'] || keyBuffer['b'])
+		{
+			if ((*itMesh)->getBoudingBox() != nullptr) {
+				t = (*itMesh)->getBoudingBox()->intersect(ray);
+				if (t > 0.0f && t < nearestT)
+				{
+					t = (*itMesh)->intersect(ray);
+					if (t > 0.0f && t < nearestT)
+					{
+						nearestT = t;
+						nearestMesh = (*itMesh);
+					}
+				}
+			}
+			else {
+				t = (*itMesh)->intersect(ray);
+				if (t > 0.0f && t < nearestT)
+				{
+					nearestT = t;
+					nearestMesh = (*itMesh);
+				}
+			}
+		}
+		//withouth Bounding Box
+		else
+		{
+			t = (*itMesh)->intersect(ray);
+			if (t > 0.0f && t < nearestT)
+			{
+				nearestT = t;
+				nearestMesh = (*itMesh);
+			}
+		}
+	}
+
+	return nearestMesh;
+}
+
 Color rayTracing(Ray ray, int depth, float RefrIndex)
 {
 	//variable to hold the color of the pixel
@@ -86,34 +134,7 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 	Vector3 reflected;
 
 	//loop for intersection of the ray with every object in the scene
-	/*TODO: bool intersect = false;
-	t = iterateObjects(ray, nearestT, intersect, nearestMesh);*/
-
-
-	std::vector<Mesh*> meshes = scene->getMeshes();
-	for (std::vector<Mesh*>::iterator itMesh = meshes.begin(); itMesh != meshes.end(); ++itMesh)
-	{
-        if((*itMesh)->getBoudingBox() != nullptr){
-            t = (*itMesh)->getBoudingBox()->intersect(ray);
-            if (t > 0.0f && t < nearestT)
-            {
-                t = (*itMesh)->intersect(ray);
-                if (t > 0.0f && t < nearestT)
-                {
-                    nearestT = t;
-                    nearestMesh = (*itMesh);
-                }
-            }
-        }
-        else {
-            t = (*itMesh)->intersect(ray);
-            if (t > 0.0f && t < nearestT)
-            {
-                nearestT = t;
-                nearestMesh = (*itMesh);
-            }
-        }
-	}
+	nearestMesh = iterateObjects(ray, nearestT);
 
 	if (nearestT == 100.0f)
 	{
@@ -160,29 +181,9 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 						nearestT = 100.0f;
 						bool shadowIntersection = false;
 
-						for (std::vector<Mesh*>::iterator itMesh = meshes.begin(); itMesh != meshes.end(); ++itMesh)
-						{
-                            if((*itMesh)->getBoudingBox() != nullptr){
-                                t = (*itMesh)->getBoudingBox()->intersect(shadowRay);
-                                if (t > 0.0f && t < nearestT)
-                                {
-                                    t = (*itMesh)->intersect(shadowRay);
-                                    if (t > 0.0f && t < nearestT)
-                                    {
-                                        shadowIntersection = true;
-                                        nearestT = t;
-                                    }
-                                }
-                            }
-                            else {
-                                t = (*itMesh)->intersect(shadowRay);
-                                if (t > 0.0f && t < nearestT)
-                                {
-                                    shadowIntersection = true;
-                                    nearestT = t;
-                                }
-                            }
-						}
+						//intersect with each object of the scene to check if it casts shadow
+						Mesh* shadowingMesh = nullptr;
+						shadowingMesh = iterateObjects(shadowRay, nearestT);
 
 						//Calculate the reflected direction
 						reflected = normalized(2.0f * dot((-ray.direction), normal) * normal - (-ray.direction));
@@ -195,7 +196,7 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 						//halfway vector creates too bright colors
 						Vector3 halfwayDir = normalized(L + (-ray.direction));
 
-						if ((!shadowIntersection) && LNormal > 0.0f)
+						if (/*(!shadowIntersection)*/ shadowingMesh == nullptr && LNormal > 0.0f)
 						{
 							//ambient component, not used
 							//Color ca = (*itLight)->getColor() * nearestMesh->getMaterial()->getKd() * nearestMesh->getMaterial()->getColor();
@@ -228,29 +229,9 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 				nearestT = 100.0f;
 				bool shadowIntersection = false;
 
-				for (std::vector<Mesh*>::iterator itMesh = meshes.begin(); itMesh != meshes.end(); ++itMesh)
-				{
-                    if((*itMesh)->getBoudingBox() != nullptr){
-                        t = (*itMesh)->getBoudingBox()->intersect(shadowRay);
-                        if (t > 0.0f && t < nearestT)
-                        {
-                            t = (*itMesh)->intersect(shadowRay);
-                            if (t > 0.0f && t < nearestT)
-                            {
-                                shadowIntersection = true;
-                                nearestT = t;
-                            }
-                        }
-                    }
-                    else {
-                        t = (*itMesh)->intersect(shadowRay);
-                        if (t > 0.0f && t < nearestT)
-                        {
-                            shadowIntersection = true;
-                            nearestT = t;
-                        }
-                    }
-				}
+				//intersect with each object of the scene to check if it casts shadow
+				Mesh* shadowingMesh = nullptr;
+				shadowingMesh = iterateObjects(shadowRay, nearestT);
 
 				//Calculate the reflected direction
 				reflected = normalized(2.0f * dot((-ray.direction), normal) * normal - (-ray.direction));
@@ -263,7 +244,7 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 				//halfway vector creates too bright colors
 				Vector3 halfwayDir = normalized(L + (-ray.direction));
 
-				if ((!shadowIntersection) && LNormal > 0.0f)
+				if (/*(!shadowIntersection)*/ shadowingMesh == nullptr && LNormal > 0.0f)
 				{
 					//ambient component, not used
 					//Color ca = (*itLight)->getColor() * nearestMesh->getMaterial()->getKd() * nearestMesh->getMaterial()->getColor();
@@ -330,40 +311,6 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
         }
 		return color;
 	}
-}
-
-float iterateObjects(Ray ray, float nearestT, bool intersected, Mesh* nearestMesh)
-{
-	float t = 0.0f;
-
-	std::vector<Mesh*> meshes = scene->getMeshes();
-	for (std::vector<Mesh*>::iterator itMesh = meshes.begin(); itMesh != meshes.end(); ++itMesh)
-	{
-		if ((*itMesh)->getBoudingBox() != nullptr) {
-			t = (*itMesh)->getBoudingBox()->intersect(ray);
-			if (t > 0.0f && t < nearestT)
-			{
-				t = (*itMesh)->intersect(ray);
-				if (t > 0.0f && t < nearestT)
-				{
-					intersected= true;
-					nearestT = t;
-					nearestMesh = (*itMesh);
-				}
-			}
-		}
-		else {
-			t = (*itMesh)->intersect(ray);
-			if (t > 0.0f && t < nearestT)
-			{
-				intersected = true;
-				nearestT = t;
-				nearestMesh = (*itMesh);
-			}
-		}
-	}
-
-	return t;
 }
 
 /////////////////////////////////////////////////////////////////////// ERRORS
