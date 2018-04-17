@@ -16,3 +16,13 @@ Material *Mesh::getMaterial()
 {
 	return material;
 }
+
+BoudingBox *Mesh::getBoudingBox()
+{
+	return boudingBox;
+}
+
+void Mesh::setBoudingBox(BoudingBox* box)
+{
+	boudingBox = box;
+}

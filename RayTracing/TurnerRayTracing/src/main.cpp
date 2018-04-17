@@ -86,6 +86,10 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 	Vector3 reflected;
 
 	//loop for intersection of the ray with every object in the scene
+	/*TODO: bool intersect = false;
+	t = iterateObjects(ray, nearestT, intersect, nearestMesh);*/
+
+
 	std::vector<Mesh*> meshes = scene->getMeshes();
 	for (std::vector<Mesh*>::iterator itMesh = meshes.begin(); itMesh != meshes.end(); ++itMesh)
 	{
@@ -326,6 +330,40 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
         }
 		return color;
 	}
+}
+
+float iterateObjects(Ray ray, float nearestT, bool intersected, Mesh* nearestMesh)
+{
+	float t = 0.0f;
+
+	std::vector<Mesh*> meshes = scene->getMeshes();
+	for (std::vector<Mesh*>::iterator itMesh = meshes.begin(); itMesh != meshes.end(); ++itMesh)
+	{
+		if ((*itMesh)->getBoudingBox() != nullptr) {
+			t = (*itMesh)->getBoudingBox()->intersect(ray);
+			if (t > 0.0f && t < nearestT)
+			{
+				t = (*itMesh)->intersect(ray);
+				if (t > 0.0f && t < nearestT)
+				{
+					intersected= true;
+					nearestT = t;
+					nearestMesh = (*itMesh);
+				}
+			}
+		}
+		else {
+			t = (*itMesh)->intersect(ray);
+			if (t > 0.0f && t < nearestT)
+			{
+				intersected = true;
+				nearestT = t;
+				nearestMesh = (*itMesh);
+			}
+		}
+	}
+
+	return t;
 }
 
 /////////////////////////////////////////////////////////////////////// ERRORS
