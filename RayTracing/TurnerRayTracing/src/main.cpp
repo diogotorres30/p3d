@@ -475,31 +475,44 @@ void renderScene()
 			{
 				//YOUR 2 FUNTIONS:
 				ray = Ray(scene->getCamera(), Vector2(x, y));
-				color = rayTracing(ray, 1, 1.0f);
 				if (keyBuffer['D'] || keyBuffer['d'])
 				{
 					Ray raytoo;
-					float ti = (0.5 - ray.origin.z) / ray.direction.z;
-					Vector3 dir = Vector3(-ray.origin.x + ray.direction.x * ti, -ray.origin.y + ray.direction.y * ti, -0.5);
-
-					for (int i = 0; i < 5; i++)
+                
+//                    Vector3 pixelCenterCordinate = scene->getCamera()->getWidth() * (x) * scene->getCamera()->getXe() + scene->getCamera()->getHeight() * y * scene->getCamera()->getYe();
+//                    // L is leftmost corner of image plane that we derived in image plane setup
+//                    Vector3 rayDirection = pixelCenterCordinate - ray.origin;
+//
+                    float t = (0.5 - scene->getCamera()->getFrom().z) / ray.direction.z;
+                    Vector3 pointAimed = scene->getCamera()->getFrom() +  ray.direction * t;
+                    
+                    
+					for (int i = 0; i < 15; i++)
 					{
-						float radius = sqrt(dis(gen));
-						float theta = 2 * 3.14 * dis(gen);
+                        float radius = sqrt(dis(gen))/20;
+                        float theta = dis(gen) * 2 * 3.14;
+                        
+                        float lsx = radius * cos(theta);
+                        float lsy = radius * sin(theta);
 
-						float lsx = radius * cos(theta) + scene->getCamera()->getFrom().x;
-						float lsy = radius * sin(theta) + scene->getCamera()->getFrom().y;
-						Vector3 orig/*ray.origin*/ = Vector3(lsx, lsy, scene->getCamera()->getFrom().z);
+                        Vector3 orig = scene->getCamera()->getFrom() + (lsx * scene->getCamera()->getXe()) + (lsy * scene->getCamera()->getYe());
+                        
+                        
+                        //Vector3 dir = ((px - 0)*scene->getCamera()->getXe()) + ((py - 0)*scene->getCamera()->getYe()) - ((focal) * //scene->getCamera()->getZe());
 
-						/*px = x * (1 / scene->getCamera()->getDf());
-						py = y * (1 / scene->getCamera()->getDf());*/
-						/*ray.direction = (px - lsx)*scene->getCamera()->getXe() + (py - lsy)*scene->getCamera()->getXe() - (1)*scene->getCamera()->getZe();*/
-
-						raytoo = Ray(orig, dir);
-
+                        Vector3 dir = pointAimed - orig;
+                        dir.normalize();
+                        
+                        raytoo = Ray(orig, dir);
+                        
+                        std::cout << dir.x << std::endl;
+                        std::cout << dir.y << std::endl;
+                        std::cout << dir.z << std::endl;
+                        
 						color += rayTracing(raytoo, 1, 1.0f);
 					}
-					color /= 5;
+                    color /= 15;
+					
 				}
 				else
 				{
