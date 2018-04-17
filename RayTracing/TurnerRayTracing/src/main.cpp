@@ -606,6 +606,7 @@ void keysPressed(unsigned char key, int x, int y)
 		Soft Shadows On/Off - key S || s
 		Uniform Grid On/Off - key G || g
 		Depth of Field On/Off - key D || d 
+		Bounding Box On/Off - key B || b
 	*/
 	if(keyBuffer[key])
 		keyBuffer[key] = false;
