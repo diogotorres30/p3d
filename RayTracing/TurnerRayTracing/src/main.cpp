@@ -89,12 +89,26 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 	std::vector<Mesh*> meshes = scene->getMeshes();
 	for (std::vector<Mesh*>::iterator itMesh = meshes.begin(); itMesh != meshes.end(); ++itMesh)
 	{
-		t = (*itMesh)->intersect(ray);
-		if (t > 0.0f && t < nearestT)
-		{
-			nearestT = t;
-			nearestMesh = (*itMesh);
-		}			
+        if((*itMesh)->getBoudingBox() != nullptr){
+            t = (*itMesh)->getBoudingBox()->intersect(ray);
+            if (t > 0.0f && t < nearestT)
+            {
+                t = (*itMesh)->intersect(ray);
+                if (t > 0.0f && t < nearestT)
+                {
+                    nearestT = t;
+                    nearestMesh = (*itMesh);
+                }
+            }
+        }
+        else {
+            t = (*itMesh)->intersect(ray);
+            if (t > 0.0f && t < nearestT)
+            {
+                nearestT = t;
+                nearestMesh = (*itMesh);
+            }
+        }
 	}
 
 	if (nearestT == 100.0f)
@@ -144,12 +158,26 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 
 						for (std::vector<Mesh*>::iterator itMesh = meshes.begin(); itMesh != meshes.end(); ++itMesh)
 						{
-							t = (*itMesh)->intersect(shadowRay);
-							if (t > 0.0f && t < nearestT)
-							{
-								shadowIntersection = true;
-								nearestT = t;
-							}
+                            if((*itMesh)->getBoudingBox() != nullptr){
+                                t = (*itMesh)->getBoudingBox()->intersect(shadowRay);
+                                if (t > 0.0f && t < nearestT)
+                                {
+                                    t = (*itMesh)->intersect(shadowRay);
+                                    if (t > 0.0f && t < nearestT)
+                                    {
+                                        shadowIntersection = true;
+                                        nearestT = t;
+                                    }
+                                }
+                            }
+                            else {
+                                t = (*itMesh)->intersect(shadowRay);
+                                if (t > 0.0f && t < nearestT)
+                                {
+                                    shadowIntersection = true;
+                                    nearestT = t;
+                                }
+                            }
 						}
 
 						//Calculate the reflected direction
@@ -198,12 +226,26 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 
 				for (std::vector<Mesh*>::iterator itMesh = meshes.begin(); itMesh != meshes.end(); ++itMesh)
 				{
-					t = (*itMesh)->intersect(shadowRay);
-					if (t > 0.0f && t < nearestT)
-					{
-						shadowIntersection = true;
-						nearestT = t;
-					}
+                    if((*itMesh)->getBoudingBox() != nullptr){
+                        t = (*itMesh)->getBoudingBox()->intersect(shadowRay);
+                        if (t > 0.0f && t < nearestT)
+                        {
+                            t = (*itMesh)->intersect(shadowRay);
+                            if (t > 0.0f && t < nearestT)
+                            {
+                                shadowIntersection = true;
+                                nearestT = t;
+                            }
+                        }
+                    }
+                    else {
+                        t = (*itMesh)->intersect(shadowRay);
+                        if (t > 0.0f && t < nearestT)
+                        {
+                            shadowIntersection = true;
+                            nearestT = t;
+                        }
+                    }
 				}
 
 				//Calculate the reflected direction

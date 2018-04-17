@@ -19,6 +19,7 @@
 #include "Camera.h"
 #include "MathAux.h"
 #include "Scene.h"
+#include "BoudingBox.h"
 
 
 class NFFLoader
@@ -27,6 +28,7 @@ class NFFLoader
 	private:
         Scene *scene;
 		Material *material;
+        BoudingBox *boudingBox;
 		Camera *camera;
 
 	public:
