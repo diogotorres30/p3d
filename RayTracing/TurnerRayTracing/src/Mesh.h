@@ -18,6 +18,8 @@ class Mesh
 {
     private:
         Material* material;
+		float xMax, yMax, zMax;
+		float xMin, yMin, zMin;
 
     public:
         Mesh();
@@ -25,6 +27,7 @@ class Mesh
 		Material *getMaterial();
         virtual float intersect(Ray &ray) = 0;
 		virtual Vector3 getNormal(Ray &ray) = 0;
+		float intersectBox(Ray &ray);
 
 };
 

@@ -2,7 +2,7 @@
 
 Box::Box(){}
 
-Box::Box(float minX, float minY, float minZ, float maxX, float maxY, float maxZ){
+Box::Box(float minX, float maxX, float minY, float maxY, float minZ, float maxZ){
     xMax = maxX;
     yMax = maxY;
     zMax = maxZ;
