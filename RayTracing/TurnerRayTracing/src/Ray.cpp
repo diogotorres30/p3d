@@ -8,8 +8,8 @@ Ray::Ray(Camera *camera, Vector2 pt)
 	origin = camera->getFrom();
 	
 	Vector3 z = -(camera->getDf()) * camera->getZe();
-	Vector3 y = camera->getHeight() * ((pt.y / camera->getResY()) - 0.5f) * camera->getYe();
-	Vector3 x = camera->getWidth() * ((pt.x / camera->getResX()) - 0.5f) * camera->getXe();
+	Vector3 y = camera->getHeight() * (((pt.y + 0.5f)/ camera->getResY()) - 0.5f) * camera->getYe();
+	Vector3 x = camera->getWidth() * (((pt.x + 0.5f) / camera->getResX()) - 0.5f) * camera->getXe();
 
 	direction = normalized(z + y + x);
 	scalar = 0.0f;

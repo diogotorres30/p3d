@@ -9,6 +9,7 @@
 #include "Mesh.h"
 #include "Material.h"
 #include "Light.h"
+#include "Box.h"
 
 class Scene
 {
@@ -17,6 +18,7 @@ class Scene
         std::vector<Mesh*> meshes;
         std::vector<Material*> materials;
         std::vector<Light*> lights;
+		std::vector<Box*> uniformGrid;
         Color background;
     
     public:

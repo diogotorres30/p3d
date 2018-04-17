@@ -446,79 +446,130 @@ void renderScene()
     int index_pos=0;
     int index_col=0;
 	Ray ray;
-	Color color;
+	Color color = Color(0.0f, 0.0f, 0.0f);
 	float epsilon = 0.0f;
+	float aperture = 5.0f;
+	float focalDistance = 2.0f;
+
+	Vector3 fp = Vector3();
+	Vector3 ps = Vector3();
+	Vector3	ls = Vector3();
 
     for (int y = 0; y < RES_Y; y++)
     {
         for (int x = 0; x < RES_X; x++)
         {
-
+			//Anti-aliasing mode
 			if (keyBuffer['A'] || keyBuffer['a'])
 			{
 				for (int p = 0; p < SAMPLE_NUMBER; p++)
 				{
-					for (int q = 0; q < SAMPLE_NUMBER; q++)
+					//with depth of field
+					if (keyBuffer['D'] || keyBuffer['d'])
 					{
-						epsilon = dis(gen);
-						float randomX = x + (p + epsilon) / SAMPLE_NUMBER;
-						float randomY = y + (q + epsilon) / SAMPLE_NUMBER;
-						ray = Ray(scene->getCamera(), Vector2(randomX, randomY));
+						float radius = sqrt(dis(gen));
+						float theta = dis(gen) * 2 * PI;
 
-						color += rayTracing(ray, 1, 1.0f);
+						//Point in the lens in camera coordinates
+						ls.x = scene->getCamera()->getWidth() * ((radius * cos(theta)) / scene->getCamera()->getResX()) * aperture;
+						ls.y = scene->getCamera()->getHeight() * ((radius * sin(theta)) / scene->getCamera()->getResY()) * aperture;
+						ls.z = 0.0f;
+
+						//Point in the lens in world coordinates
+						Vector3 origX = ls.x * scene->getCamera()->getXe();
+						Vector3 origY = ls.y  * scene->getCamera()->getYe();
+						Vector3 origZ = 0.0f;
+
+						Vector3 orig = origX + origY + origZ;
+						orig += scene->getCamera()->getFrom();
+
+						for (int q = 0; q < SAMPLE_NUMBER; q++)
+						{
+							epsilon = dis(gen);
+							float randomX = x + (p + epsilon) / SAMPLE_NUMBER;
+							float randomY = y + (q + epsilon) / SAMPLE_NUMBER;
+
+							//Pixel in the view plane, in camera coordinates
+							ps.x = scene->getCamera()->getWidth() * (((randomX + 0.5f) / scene->getCamera()->getResX()) - 0.5f);
+							ps.y = scene->getCamera()->getHeight() * (((randomY + 0.5f) / scene->getCamera()->getResY()) - 0.5f);
+							ps.z = -scene->getCamera()->getDf();
+
+							//focal point in camera coordinates
+							fp.x = ps.x * (focalDistance / scene->getCamera()->getDf());
+							fp.y = ps.y * (focalDistance / scene->getCamera()->getDf());
+							fp.z = -focalDistance;
+
+							Vector3 nx = (fp.x - ls.x) * scene->getCamera()->getXe();
+							Vector3 ny = (fp.y - ls.y) * scene->getCamera()->getYe();
+							Vector3 nz = (fp.z - ls.z) * scene->getCamera()->getZe();
+
+							Vector3 dir = normalized(nx + ny + nz);
+							ray = Ray(orig, dir);
+
+							color += rayTracing(ray, 1, 1.0f);
+						}
+					}
+					else
+					{
+						for (int q = 0; q < SAMPLE_NUMBER; q++)
+						{
+							epsilon = dis(gen);
+							float randomX = x + (p + epsilon) / SAMPLE_NUMBER;
+							float randomY = y + (q + epsilon) / SAMPLE_NUMBER;
+							ray = Ray(scene->getCamera(), Vector2(randomX, randomY));
+
+							color += rayTracing(ray, 1, 1.0f);
+						}
 					}
 				}
-
 				color = color / (SAMPLE_NUMBER*SAMPLE_NUMBER);
+			}
+			//Depth of Field mode
+			else if (keyBuffer['D'] || keyBuffer['d'])
+			{
+				for (int i = 0; i < SAMPLE_NUMBER; i++)
+				{
+					float radius = sqrt(dis(gen));
+					float theta = dis(gen) * 2 * PI;
+
+					//Point in the lens in camera coordinates
+					ls.x = scene->getCamera()->getWidth() * ((radius * cos(theta)) / scene->getCamera()->getResX()) * aperture;
+					ls.y = scene->getCamera()->getHeight() * ((radius * sin(theta)) / scene->getCamera()->getResY()) * aperture;
+					ls.z = 0.0f;
+
+					//Point in the lens in world coordinates
+					Vector3 origX = ls.x * scene->getCamera()->getXe();
+					Vector3 origY = ls.y  * scene->getCamera()->getYe();
+					Vector3 origZ = 0.0f;
+
+					Vector3 orig = origX + origY + origZ;
+					orig += scene->getCamera()->getFrom();
+
+					//Pixel in the view plane, in camera coordinates
+					ps.x = scene->getCamera()->getWidth() * (((x + 0.5f) / scene->getCamera()->getResX()) - 0.5f);
+					ps.y = scene->getCamera()->getHeight() * (((y + 0.5f) / scene->getCamera()->getResY()) - 0.5f);
+					ps.z = -scene->getCamera()->getDf();
+
+					//focal point in camera coordinates
+					fp.x = ps.x * (focalDistance / scene->getCamera()->getDf());
+					fp.y = ps.y * (focalDistance / scene->getCamera()->getDf());
+					fp.z = -focalDistance;
+
+					Vector3 nx = (fp.x - ls.x) * scene->getCamera()->getXe();
+					Vector3 ny = (fp.y - ls.y) * scene->getCamera()->getYe();
+					Vector3 nz = (fp.z - ls.z) * scene->getCamera()->getZe();
+
+					Vector3 dir = normalized(nx + ny + nz);
+					ray = Ray(orig/*scene->getCamera()->getFrom()*/, dir);
+
+					color += rayTracing(ray, 1, 1.0f);
+				}
+				color /= SAMPLE_NUMBER;
 			}
 			else
 			{
-				//YOUR 2 FUNTIONS:
 				ray = Ray(scene->getCamera(), Vector2(x, y));
-				if (keyBuffer['D'] || keyBuffer['d'])
-				{
-					Ray raytoo;
-                
-//                    Vector3 pixelCenterCordinate = scene->getCamera()->getWidth() * (x) * scene->getCamera()->getXe() + scene->getCamera()->getHeight() * y * scene->getCamera()->getYe();
-//                    // L is leftmost corner of image plane that we derived in image plane setup
-//                    Vector3 rayDirection = pixelCenterCordinate - ray.origin;
-//
-                    float t = (0.5 - scene->getCamera()->getFrom().z) / ray.direction.z;
-                    Vector3 pointAimed = scene->getCamera()->getFrom() +  ray.direction * t;
-                    
-                    
-					for (int i = 0; i < 15; i++)
-					{
-                        float radius = sqrt(dis(gen))/20;
-                        float theta = dis(gen) * 2 * 3.14;
-                        
-                        float lsx = radius * cos(theta);
-                        float lsy = radius * sin(theta);
-
-                        Vector3 orig = scene->getCamera()->getFrom() + (lsx * scene->getCamera()->getXe()) + (lsy * scene->getCamera()->getYe());
-                        
-                        
-                        //Vector3 dir = ((px - 0)*scene->getCamera()->getXe()) + ((py - 0)*scene->getCamera()->getYe()) - ((focal) * //scene->getCamera()->getZe());
-
-                        Vector3 dir = pointAimed - orig;
-                        dir.normalize();
-                        
-                        raytoo = Ray(orig, dir);
-                        
-                        std::cout << dir.x << std::endl;
-                        std::cout << dir.y << std::endl;
-                        std::cout << dir.z << std::endl;
-                        
-						color += rayTracing(raytoo, 1, 1.0f);
-					}
-                    color /= 15;
-					
-				}
-				else
-				{
-					color = rayTracing(ray, 1, 1.0f);
-				}
-
+				color = rayTracing(ray, 1, 1.0f);
 			}
            
             
