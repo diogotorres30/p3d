@@ -12,14 +12,14 @@
 #include <math.h>
 #include "MathAux.h"
 #include "Material.h"
-#include "BoudingBox.h"
+#include "BoundingBox.h"
 #include "Ray.h"
 
 class Mesh
 {
 private:
 	Material * material;
-	BoudingBox* boudingBox = nullptr;
+	BoundingBox* boundingBox = nullptr;
 	float xMax, yMax, zMax;
 	float xMin, yMin, zMin;
 
@@ -27,8 +27,8 @@ public:
 	Mesh();
 	Mesh(Material* mat);
 	Material *getMaterial();
-	BoudingBox *getBoudingBox();
-	void setBoudingBox(BoudingBox* box);
+	BoundingBox *getBoundingBox();
+	void setBoundingBox(BoundingBox* box);
 	virtual float intersect(Ray &ray) = 0;
 	virtual Vector3 getNormal(Ray &ray) = 0;
 };

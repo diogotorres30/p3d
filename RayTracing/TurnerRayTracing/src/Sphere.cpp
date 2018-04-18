@@ -6,10 +6,10 @@ Sphere::Sphere(Vector3 &newcenter, float newradius, Material *mat) : Mesh(mat)
 {
     center = newcenter;
     radius = newradius;
-    BoudingBox* box = new BoudingBox(center.x - radius, center.x + radius,
+    BoundingBox* box = new BoundingBox(center.x - radius, center.x + radius,
                                     center.y - radius, center.y + radius,
                                     center.z - radius, center.z + radius);
-    setBoudingBox(box);
+    setBoundingBox(box);
     
 }
 

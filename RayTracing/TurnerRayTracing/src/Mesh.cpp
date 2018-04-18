@@ -17,12 +17,12 @@ Material *Mesh::getMaterial()
 	return material;
 }
 
-BoudingBox *Mesh::getBoudingBox()
+BoundingBox *Mesh::getBoundingBox()
 {
-	return boudingBox;
+	return boundingBox;
 }
 
-void Mesh::setBoudingBox(BoudingBox* box)
+void Mesh::setBoundingBox(BoundingBox* box)
 {
-	boudingBox = box;
+	boundingBox = box;
 }

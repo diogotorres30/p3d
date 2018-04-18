@@ -29,6 +29,7 @@
 #include "Scene.h"
 #include "Color.h"
 #include "Ray.h"
+#include "Grid.h"
 
 #define CAPTION "ray tracer"
 
@@ -84,8 +85,8 @@ Mesh* iterateObjects(Ray ray, float &nearestT)
 		//Objects with Bounding Box mode
 		if (keyBuffer['B'] || keyBuffer['b'])
 		{
-			if ((*itMesh)->getBoudingBox() != nullptr) {
-				t = (*itMesh)->getBoudingBox()->intersect(ray);
+			if ((*itMesh)->getBoundingBox() != nullptr) {
+				t = (*itMesh)->getBoundingBox()->intersect(ray);
 				if (t > 0.0f && t < nearestT)
 				{
 					t = (*itMesh)->intersect(ray);
@@ -761,6 +762,13 @@ int main(int argc, char* argv[])
     RES_X = scene->getCamera()->getResX();
     RES_Y = scene->getCamera()->getResY();
     
+	Grid grid = Grid(scene->getMeshes());
+
+	for (int i = 0; i < grid.getUniformGrid().size(); i++)
+	{
+		std::cout << grid.getUniformGrid()[i]->getMeshes()->size() << std::endl;
+	}
+
     if(draw_mode == 0) { // desenhar o conte˙do da janela ponto a ponto
         size_vertices = 2*sizeof(float);
         size_colors = 3*sizeof(float);

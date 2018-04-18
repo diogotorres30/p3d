@@ -5,6 +5,7 @@
 #include <stdexcept>
 #include <cmath>
 
+#define HUGE_VALUE 100000
 #define EPSILON 0.0001
 #define CLEAN_VALUE 1000
 #define SIZE2X2 4
@@ -424,6 +425,8 @@
 	float degreesToRadians(const float angle);
 
 	float fastInvSqrt(float x);
+
+	int clamp(int value, int min, int max);
 
 //}
 

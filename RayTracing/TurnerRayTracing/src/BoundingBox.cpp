@@ -1,8 +1,8 @@
-#include "BoudingBox.h"
+#include "BoundingBox.h"
 
-BoudingBox::BoudingBox(){}
+BoundingBox::BoundingBox(){}
 
-BoudingBox::BoudingBox(float minX, float maxX, float minY, float maxY, float minZ, float maxZ){
+BoundingBox::BoundingBox(float minX, float maxX, float minY, float maxY, float minZ, float maxZ){
     xMax = maxX;
     yMax = maxY;
     zMax = maxZ;
@@ -12,7 +12,7 @@ BoudingBox::BoudingBox(float minX, float maxX, float minY, float maxY, float min
     
 }
 
-float BoudingBox::intersect(Ray &ray){
+float BoundingBox::intersect(Ray &ray){
     float t = -1.0f;
     float a = 1.0f / ray.direction.x;
     float tx_min, tx_max;
@@ -82,6 +82,6 @@ float BoudingBox::intersect(Ray &ray){
     return t;
 }
 
-Vector3 BoudingBox::getNormal(Ray &ray){
+Vector3 BoundingBox::getNormal(Ray &ray){
     return normal;
 }
