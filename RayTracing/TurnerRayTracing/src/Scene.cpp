@@ -13,6 +13,11 @@ void Scene::setCamera(Camera *cam)
     camera = cam;
 }
 
+void Scene::createAccelerationStructure()
+{
+	accelerationStructure = new Grid(meshes);
+}
+
 void Scene::addMesh(Mesh *mesh)
 {
     meshes.push_back(mesh);

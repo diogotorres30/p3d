@@ -7,6 +7,28 @@ Triangle::Triangle(Vector3 newp1, Vector3 newp2, Vector3 newp3, Material *mat) :
 	p1 = newp1;
 	p2 = newp2;
 	p3 = newp3;
+
+	float xMin, xMax, yMin, yMax, zMin, zMax;
+
+	xMin = std::min(p1.x, p2.x);
+	xMin = std::min(xMin, p3.x);
+
+	xMax = std::max(p1.x, p2.x);
+	xMax = std::max(xMax, p3.x);
+
+	yMin = std::min(p1.y, p2.y);
+	yMin = std::min(yMin, p3.y);
+
+	yMax = std::max(p1.y, p2.y);
+	yMax = std::max(yMax, p3.y);
+
+	zMin = std::min(p1.z, p2.z);
+	zMin = std::min(zMin, p3.z);
+
+	zMax = std::max(p1.z, p2.z);
+	zMax = std::max(zMax, p3.z);
+
+	BoundingBox* box = new BoundingBox(xMin, xMax, yMin, yMax, zMin, zMax);
 }
 
 float Triangle::intersect(Ray &ray) {

@@ -111,6 +111,10 @@
 	Vector3 operator / (const Vector3 &v, const float &num);
 
 	bool operator == (const Vector3 &v, const Vector3 &u);
+	bool operator < (const Vector3 &v, const Vector3 &u);
+	bool operator <= (const Vector3 &v, const Vector3 &u);
+	bool operator > (const Vector3 &v, const Vector3 &u);
+	bool operator >= (const Vector3 &v, const Vector3 &u);
 
 	float quadrance(const Vector3 &v);
 	float norm(const Vector3 &v);

@@ -2,7 +2,7 @@
 
 Ray::Ray(){}
 
-Ray::Ray(Camera *camera, Vector2 pt)
+Ray::Ray(Camera *camera, Vector2 pt, int uniqueID)
 {
 	point = Vector3(0.0f);
 	origin = camera->getFrom();
@@ -13,14 +13,16 @@ Ray::Ray(Camera *camera, Vector2 pt)
 
 	direction = normalized(z + y + x);
 	scalar = 0.0f;
+	ID = uniqueID;
 }
 
-Ray::Ray(Vector3 orig, Vector3 dir)
+Ray::Ray(Vector3 orig, Vector3 dir, int uniqueID)
 {
 	point = Vector3(0.0f);
 	origin = orig;
 	direction = normalized(dir);
 	scalar = 0.0f;
+	ID = uniqueID;
 }
 
 Ray::~Ray(){}

@@ -71,6 +71,14 @@ std::random_device rd;  //Will be used to obtain a seed for the random number en
 std::mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
 std::uniform_real_distribution<> dis(0.0, 1.0);
 
+//Ray unique id
+int RayId = 0;
+
+int uniqueRayID()
+{
+	return ++RayId;
+}
+
 ///////////////////////////////////////////////////////////////////////  RAY-TRACE SCENE
 
 Mesh* iterateObjects(Ray ray, float &nearestT)
@@ -134,8 +142,15 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 	Vector3 fixedPoint = Vector3(0.0f);
 	Vector3 reflected;
 
-	//loop for intersection of the ray with every object in the scene
-	nearestMesh = iterateObjects(ray, nearestT);
+	if (keyBuffer['G'] || keyBuffer['g'])
+	{
+		nearestMesh = scene->getAccelerationStructure()->intersect(ray, nearestT);
+	}
+	else
+	{
+		//loop for intersection of the ray with every object in the scene
+		nearestMesh = iterateObjects(ray, nearestT);
+	}
 
 	if (nearestT == 100.0f)
 	{
@@ -177,10 +192,9 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 						//Fixed point for ray in the light direction
 						fixedPoint = ray.point + 0.0001f * L;
 						//create shadow ray
-						Ray shadowRay = Ray(fixedPoint, L);
+						Ray shadowRay = Ray(fixedPoint, L, uniqueRayID());
 						t = 0.0f;
 						nearestT = 100.0f;
-						bool shadowIntersection = false;
 
 						//intersect with each object of the scene to check if it casts shadow
 						Mesh* shadowingMesh = nullptr;
@@ -197,7 +211,7 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 						//halfway vector creates too bright colors
 						Vector3 halfwayDir = normalized(L + (-ray.direction));
 
-						if (/*(!shadowIntersection)*/ shadowingMesh == nullptr && LNormal > 0.0f)
+						if (shadowingMesh == nullptr && LNormal > 0.0f)
 						{
 							//ambient component, not used
 							//Color ca = (*itLight)->getColor() * nearestMesh->getMaterial()->getKd() * nearestMesh->getMaterial()->getColor();
@@ -225,10 +239,9 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 				//Fixed point for ray in the light direction
 				fixedPoint = ray.point + 0.0001f * L;
 				//create shadow ray
-				Ray shadowRay = Ray(fixedPoint, L);
+				Ray shadowRay = Ray(fixedPoint, L, uniqueRayID());
 				t = 0.0f;
 				nearestT = 100.0f;
-				bool shadowIntersection = false;
 
 				//intersect with each object of the scene to check if it casts shadow
 				Mesh* shadowingMesh = nullptr;
@@ -245,7 +258,7 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 				//halfway vector creates too bright colors
 				Vector3 halfwayDir = normalized(L + (-ray.direction));
 
-				if (/*(!shadowIntersection)*/ shadowingMesh == nullptr && LNormal > 0.0f)
+				if (shadowingMesh == nullptr && LNormal > 0.0f)
 				{
 					//ambient component, not used
 					//Color ca = (*itLight)->getColor() * nearestMesh->getMaterial()->getKd() * nearestMesh->getMaterial()->getColor();
@@ -274,7 +287,7 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 			//Fixed point for reflection
             fixedPoint = ray.point + 0.0001f * reflected;
 			//create reflected ray
-			Ray rRay = Ray(fixedPoint, reflected);
+			Ray rRay = Ray(fixedPoint, reflected, uniqueRayID());
 			//shoot reflected ray
 			Color rColor = rayTracing(rRay, depth + 1, RefrIndex);
 			//add reflection color to the pixel color
@@ -303,7 +316,7 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 			//Fixed point for refraction
             fixedPoint = ray.point + 0.0001f * rt;
 			//create refracted ray
-            Ray tRay = Ray(fixedPoint, rt);
+            Ray tRay = Ray(fixedPoint, rt, uniqueRayID());
 			//shoot refracted ray
             Color tColor = rayTracing(tRay, depth + 1, RefrIndex);
 			//add refraction color to the pixel color
@@ -476,8 +489,8 @@ void renderScene()
 	Ray ray;
 	Color color = Color(0.0f, 0.0f, 0.0f);
 	float epsilon = 0.0f;
-	float aperture = 5.0f;
-	float focalDistance = 2.0f;
+	float aperture = 10.0f;
+	float focalDistance = 3.0f;
 
 	Vector3 fp = Vector3();
 	Vector3 ps = Vector3();
@@ -532,7 +545,7 @@ void renderScene()
 							Vector3 nz = (fp.z - ls.z) * scene->getCamera()->getZe();
 
 							Vector3 dir = normalized(nx + ny + nz);
-							ray = Ray(orig, dir);
+							ray = Ray(orig, dir, uniqueRayID());
 
 							color += rayTracing(ray, 1, 1.0f);
 						}
@@ -544,7 +557,7 @@ void renderScene()
 							epsilon = dis(gen);
 							float randomX = x + (p + epsilon) / SAMPLE_NUMBER;
 							float randomY = y + (q + epsilon) / SAMPLE_NUMBER;
-							ray = Ray(scene->getCamera(), Vector2(randomX, randomY));
+							ray = Ray(scene->getCamera(), Vector2(randomX, randomY), uniqueRayID());
 
 							color += rayTracing(ray, 1, 1.0f);
 						}
@@ -588,7 +601,7 @@ void renderScene()
 					Vector3 nz = (fp.z - ls.z) * scene->getCamera()->getZe();
 
 					Vector3 dir = normalized(nx + ny + nz);
-					ray = Ray(orig/*scene->getCamera()->getFrom()*/, dir);
+					ray = Ray(orig/*scene->getCamera()->getFrom()*/, dir, uniqueRayID());
 
 					color += rayTracing(ray, 1, 1.0f);
 				}
@@ -596,7 +609,7 @@ void renderScene()
 			}
 			else
 			{
-				ray = Ray(scene->getCamera(), Vector2(x, y));
+				ray = Ray(scene->getCamera(), Vector2(x, y), uniqueRayID());
 				color = rayTracing(ray, 1, 1.0f);
 			}
            
@@ -640,6 +653,12 @@ void keysPressed(unsigned char key, int x, int y)
 		keyBuffer[key] = false;
 	else
 		keyBuffer[key] = true;
+
+	if ((keyBuffer['G'] || keyBuffer['g']) && (scene->getAccelerationStructure() == nullptr))
+	{
+		scene->createAccelerationStructure();
+	}
+	
 	glutPostRedisplay();
 }
 
@@ -754,20 +773,13 @@ int main(int argc, char* argv[])
     #ifdef __APPLE__
         std::string filename = std::string("ball.nff");
     #else
-       std::string filename = std::string("../../RayTracing/TurnerRayTracing/src/nffs/ball_depth.nff");
+       std::string filename = std::string("../../RayTracing/TurnerRayTracing/src/nffs/balls_low.nff");
     #endif
 	scene = loader.createScene(filename);
 	scene->getCamera()->calculate();
 
     RES_X = scene->getCamera()->getResX();
     RES_Y = scene->getCamera()->getResY();
-    
-	Grid grid = Grid(scene->getMeshes());
-
-	for (int i = 0; i < grid.getUniformGrid().size(); i++)
-	{
-		std::cout << grid.getUniformGrid()[i]->getMeshes()->size() << std::endl;
-	}
 
     if(draw_mode == 0) { // desenhar o conte˙do da janela ponto a ponto
         size_vertices = 2*sizeof(float);

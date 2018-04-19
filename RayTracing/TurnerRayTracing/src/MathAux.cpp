@@ -306,6 +306,26 @@ bool operator == (const Vector3 &v, const Vector3 &u)
 	return ((fabs(v.x - u.x) <= EPSILON && fabs(v.y - u.y) <= EPSILON && fabs(v.z - u.z) <= EPSILON));
 }
 
+bool operator < (const Vector3 &v, const Vector3 &u)
+{
+	return ((v.x < u.x) && (v.y < u.y) && (v.z < u.z));
+}
+
+bool operator <= (const Vector3 &v, const Vector3 &u)
+{
+	return ((v.x <= u.x) && (v.y <= u.y) && (v.z <= u.z));
+}
+
+bool operator > (const Vector3 &v, const Vector3 &u)
+{
+	return ((v.x > u.x) && (v.y > u.y) && (v.z > u.z));
+}
+
+bool operator >= (const Vector3 &v, const Vector3 &u)
+{
+	return ((v.x >= u.x) && (v.y >= u.y) && (v.z >= u.z));
+}
+
 float quadrance(const Vector3 &v)
 {
 	return v.x*v.x + v.y*v.y + v.z*v.z;

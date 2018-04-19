@@ -10,6 +10,7 @@
 #endif
 
 #include <math.h>
+#include <algorithm>
 #include "MathAux.h"
 #include "Material.h"
 #include "BoundingBox.h"
@@ -22,6 +23,8 @@ private:
 	BoundingBox* boundingBox = nullptr;
 	float xMax, yMax, zMax;
 	float xMin, yMin, zMin;
+	int cachedRayId = 0;
+	float cachedIntersection = 0.0f;
 
 public:
 	Mesh();
@@ -29,6 +32,10 @@ public:
 	Material *getMaterial();
 	BoundingBox *getBoundingBox();
 	void setBoundingBox(BoundingBox* box);
+	int getCachedRayId() { return cachedRayId; };
+	void setCachedRayId(int id) { cachedRayId = id; };
+	float getCachedIntersection() { return cachedIntersection; };
+	void setCachedIntersection(float t) { cachedIntersection = t; };
 	virtual float intersect(Ray &ray) = 0;
 	virtual Vector3 getNormal(Ray &ray) = 0;
 };
