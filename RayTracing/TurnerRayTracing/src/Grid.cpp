@@ -35,9 +35,10 @@ Grid::Grid(std::vector<Mesh*> meshes)
 	p0 = pMin;
 	p1 = pMax;
 
-	BB = new Box(pMin.x, pMax.x, pMin.y, pMax.y, pMin.z, pMax.z);
+	BB = new BoundingBox(pMin.x, pMax.x, pMin.y, pMax.y, pMin.z, pMax.z);
 
-	int N = meshes.size();
+	//the size except for the plane
+	int N = meshes.size() - 1;
 
 	//multiplying factor
 	int m = 2;
@@ -100,16 +101,17 @@ Grid::Grid(std::vector<Mesh*> meshes)
 	}
 }
 
-Mesh *Grid::intersect(Ray ray, float &nearestT)
+Mesh *Grid::intersect(Ray &ray, float &nearestT)
 {
 	Mesh *nearestMesh = nullptr;
-	int ix, iy, iz;
+	int index;
+	int ix = 0, iy = 0, iz = 0;
 
 	float t = BB->intersect(ray);
 
 	if (t > 0.0f)
 	{
-		if ((ray.origin > p0) && (ray.origin < p1))
+		if ((ray.origin >= p0) && (ray.origin <= p1))
 		{
 			ix = clamp(((ray.origin.x - p0.x) * (Nx / (p1.x - p0.x))), 0, (Nx - 1));
 			iy = clamp(((ray.origin.y - p0.y) * (Ny / (p1.y - p0.y))), 0, (Ny - 1));
@@ -125,36 +127,77 @@ Mesh *Grid::intersect(Ray ray, float &nearestT)
 
 		}
 	}
+	else
+	{
+ 		nearestT = HUGE_VALUE;
+		return nullptr;
+	}
 
-	//// ray parameter increments per cell in the x, y, and z directions
-	//double dtx = (tx_max - tx_min) / Nx;
-	//double dty = (ty_max - ty_min) / Ny;
-	//double dtz = (tz_max - tz_min) / Nz;
-	//double tx_next, ty_next, tz_next;
-	//int ix_step, iy_step, iz_step;
-	//int ix_stop, iy_stop, iz_stop;
+	// ray parameter increments per cell in the x, y, and z directions
+	float dtx = (p1.x - p0.x) / Nx;
+	float dty = (p1.y - p0.y) / Ny;
+	float dtz = (p1.z - p0.z) / Nz;
+	float tx_next, ty_next, tz_next;
+	int ix_step, iy_step, iz_step;
+	int ix_stop, iy_stop, iz_stop;
 
-	////A ray has direction (dx, dy). Possible cases for direction xx’:
-	//if (ray.direction.x > 0) {
-	//	tx_next = tx_min + (ix + 1) * dtx;
-	//	ix_step = +1;
-	//	ix_stop = Nx;
+	//A ray has direction (dx, dy). Possible cases for direction xx’:
+	//if (ray.direction.x > 0.0f) {
+	tx_next = p0.x + (ix + 1) * dtx;
+	ix_step = +1;
+	ix_stop = Nx;
 	//}
 	//else {
-	//	tx_next = tx_min + (Nx - ix) * dtx;
+	//	tx_next = p0.x + (Nx - ix) * dtx;
 	//	ix_step = -1;
 	//	ix_stop = -1;
 	//}
-	//if (ray.direction.x == 0.0) {
+	//if (ray.direction.x == 0.0f) {
 	//	tx_next = HUGE_VALUE; //WHY?
 	//	ix_step = -1; // just to initialize. Never used
 	//	ix_stop = -1;
 	//}
 
-	int index = ix + Nx * iy + Nx * Ny * iz;
-	
-	while (nearestMesh == nullptr)
+	//A ray has direction (dx, dy). Possible cases for direction xx’:
+	//if (ray.direction.y > 0.0f) {
+	ty_next = p0.y + (iy + 1) * dty;
+	iy_step = +1;
+	iy_stop = Ny;
+	//}
+	//else {
+	//	ty_next = p0.y + (Ny - iy) * dty;
+	//	iy_step = -1;
+	//	iy_stop = -1;
+	//}
+	//if (ray.direction.y == 0.0f) {
+	//	ty_next = HUGE_VALUE; //WHY?
+	//	iy_step = -1; // just to initialize. Never used
+	//	iy_stop = -1;
+	//}
+
+	//A ray has direction (dx, dy). Possible cases for direction xx’:
+	//if (ray.direction.z > 0.0f) {
+	tz_next = p0.z + (iz + 1) * dtz;
+	iz_step = +1;
+	iz_stop = Nz;
+	//}
+	//else {
+	//	tz_next = p0.z + (Nz - iz) * dtz;
+	//	iz_step = -1;
+	//	iz_stop = -1;
+	//}
+	//if (ray.direction.z == 0.0f) {
+	//	tz_next = HUGE_VALUE; //WHY?
+	//	iz_step = -1; // just to initialize. Never used
+	//	iz_stop = -1;
+	//}
+
+	while (true)
 	{
+		nearestT = HUGE_VALUE;
+		t = 0.0f;
+
+		index = ix + Nx * iy + Nx * Ny * iz;
 		std::vector<Mesh*> *meshes = uniformGrid[index]->getMeshes();
 		for (std::vector<Mesh*>::iterator itMesh = meshes->begin(); itMesh != meshes->end(); ++itMesh)
 		{
@@ -170,13 +213,64 @@ Mesh *Grid::intersect(Ray ray, float &nearestT)
 			}
 		}
 
-		if (nearestMesh != nullptr)
+		if (nearestMesh != nullptr /*&& nearestT < tx_next && nearestT < ty_next && nearestT < tz_next*/)
 		{
 			return nearestMesh;
 		}
 
+		if (tx_next < ty_next && tx_next < tz_next)
+		{
+			//if (nearestMesh != nullptr || t < tx_next)
+			//{
+			//	return nearestMesh;
+			//}
 
+			tx_next += dtx;
+			ix += ix_step;
+
+			if (ix == ix_stop)
+			{
+				nearestT = HUGE_VALUE;
+				return nullptr;
+			}
+				
+		}
+		else
+		{
+			//if (nearestMesh != nullptr || t < ty_next)
+			//{
+			//	return nearestMesh;
+			//}
+
+			if (ty_next < tz_next)
+			{
+				ty_next += dty;
+				iy += iy_step;
+
+				if (iy == iy_stop)
+				{
+					nearestT = HUGE_VALUE;
+					return nullptr;
+				}
+
+			}
+			else
+			{
+				//if (nearestMesh != nullptr || t < tz_next)
+				//{
+				//	return nearestMesh;
+				//}
+
+				tz_next += dtz;
+				iz += iz_step;
+
+				if (iz == iz_stop)
+				{
+					nearestT = HUGE_VALUE;
+					return nullptr;
+				}
+			}
+		}
 	}
 
-	return nearestMesh;
 }

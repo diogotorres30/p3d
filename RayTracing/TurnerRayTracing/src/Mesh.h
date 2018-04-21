@@ -21,8 +21,6 @@ class Mesh
 private:
 	Material * material;
 	BoundingBox* boundingBox = nullptr;
-	float xMax, yMax, zMax;
-	float xMin, yMin, zMin;
 	int cachedRayId = 0;
 	float cachedIntersection = 0.0f;
 

@@ -29,7 +29,5 @@ Ray::~Ray(){}
 
 void Ray::intersectionPoint(float t)
 {
-	point.x = origin.x + (direction.x * t);
-	point.y = origin.y + (direction.y * t);
-	point.z = origin.z + (direction.z * t);
+	point = origin + (direction * t);
 }

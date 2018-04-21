@@ -1,14 +1,3 @@
-///////////////////////////////////////////////////////////////////////
-//
-// P3D Course
-// (c) 2016 by Jo„o Madeiras Pereira
-// TEMPLATE: Whitted Ray Tracing NFF scenes and drawing points with Modern OpenGL
-//
-//You should develop your rayTracing( Ray ray, int depth, float RefrIndex) which returns a color and
-// to develop your load_NFF function
-//
-///////////////////////////////////////////////////////////////////////
-
 #include <stdlib.h>
 #include <iostream>
 #include <sstream>
@@ -134,7 +123,7 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 	//variable to hold the color of the pixel
 	Color color;
 	//variable to hold the nearest t where an object was intersected 
-	float nearestT = 100.0f;
+	float nearestT = HUGE_VALUE;
 	//variable to hold the current t
 	float t = 0.0f;
 	//variable to hold a pointer to the object that was intersected the closest to the origin
@@ -145,6 +134,16 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 	if (keyBuffer['G'] || keyBuffer['g'])
 	{
 		nearestMesh = scene->getAccelerationStructure()->intersect(ray, nearestT);
+
+		if (nearestMesh == nullptr)
+		{
+			t = scene->getMeshes()[0]->intersect(ray);
+			if (t > 0.0f && t < nearestT)
+			{
+				nearestT = t;
+				nearestMesh = scene->getMeshes()[0];
+			}
+		}
 	}
 	else
 	{
@@ -152,7 +151,7 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 		nearestMesh = iterateObjects(ray, nearestT);
 	}
 
-	if (nearestT == 100.0f)
+	if (nearestT == HUGE_VALUE)
 	{
 		return scene->getBackground();
 	}
@@ -198,7 +197,25 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 
 						//intersect with each object of the scene to check if it casts shadow
 						Mesh* shadowingMesh = nullptr;
-						shadowingMesh = iterateObjects(shadowRay, nearestT);
+						if (keyBuffer['G'] || keyBuffer['g'])
+						{
+							shadowingMesh = scene->getAccelerationStructure()->intersect(shadowRay, nearestT);
+
+							if (nearestMesh == nullptr)
+							{
+								t = scene->getMeshes()[0]->intersect(shadowRay);
+								if (t > 0.0f && t < nearestT)
+								{
+									nearestT = t;
+									shadowingMesh = scene->getMeshes()[0];
+								}
+							}
+						}
+						else
+						{
+							//loop for intersection of the ray with every object in the scene
+							shadowingMesh = iterateObjects(shadowRay, nearestT);
+						}
 
 						//Calculate the reflected direction
 						reflected = normalized(2.0f * dot((-ray.direction), normal) * normal - (-ray.direction));
@@ -245,7 +262,25 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 
 				//intersect with each object of the scene to check if it casts shadow
 				Mesh* shadowingMesh = nullptr;
-				shadowingMesh = iterateObjects(shadowRay, nearestT);
+				if (keyBuffer['G'] || keyBuffer['g'])
+				{
+					shadowingMesh = scene->getAccelerationStructure()->intersect(shadowRay, nearestT);
+
+					if (nearestMesh == nullptr)
+					{
+						t = scene->getMeshes()[0]->intersect(shadowRay);
+						if (t > 0.0f && t < nearestT)
+						{
+							nearestT = t;
+							shadowingMesh = scene->getMeshes()[0];
+						}
+					}
+				}
+				else
+				{
+					//loop for intersection of the ray with every object in the scene
+					shadowingMesh = iterateObjects(shadowRay, nearestT);
+				}
 
 				//Calculate the reflected direction
 				reflected = normalized(2.0f * dot((-ray.direction), normal) * normal - (-ray.direction));
@@ -496,6 +531,11 @@ void renderScene()
 	Vector3 ps = Vector3();
 	Vector3	ls = Vector3();
 
+	if ((keyBuffer['G'] || keyBuffer['g']) && (scene->getAccelerationStructure() == nullptr))
+	{
+		scene->createAccelerationStructure();
+	}
+
     for (int y = 0; y < RES_Y; y++)
     {
         for (int x = 0; x < RES_X; x++)
@@ -653,11 +693,6 @@ void keysPressed(unsigned char key, int x, int y)
 		keyBuffer[key] = false;
 	else
 		keyBuffer[key] = true;
-
-	if ((keyBuffer['G'] || keyBuffer['g']) && (scene->getAccelerationStructure() == nullptr))
-	{
-		scene->createAccelerationStructure();
-	}
 	
 	glutPostRedisplay();
 }
@@ -773,7 +808,7 @@ int main(int argc, char* argv[])
     #ifdef __APPLE__
         std::string filename = std::string("ball.nff");
     #else
-       std::string filename = std::string("../../RayTracing/TurnerRayTracing/src/nffs/balls_low.nff");
+       std::string filename = std::string("../../RayTracing/TurnerRayTracing/src/nffs/ball_depth.nff");
     #endif
 	scene = loader.createScene(filename);
 	scene->getCamera()->calculate();
