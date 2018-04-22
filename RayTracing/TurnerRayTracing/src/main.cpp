@@ -137,6 +137,7 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 
 		if (nearestMesh == nullptr)
 		{
+			nearestT = HUGE_VALUE;
 			t = scene->getMeshes()[0]->intersect(ray);
 			if (t > 0.0f && t < nearestT)
 			{
@@ -193,7 +194,7 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 						//create shadow ray
 						Ray shadowRay = Ray(fixedPoint, L, uniqueRayID());
 						t = 0.0f;
-						nearestT = 100.0f;
+						nearestT = HUGE_VALUE;
 
 						//intersect with each object of the scene to check if it casts shadow
 						Mesh* shadowingMesh = nullptr;
@@ -201,12 +202,12 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 						{
 							shadowingMesh = scene->getAccelerationStructure()->intersect(shadowRay, nearestT);
 
-							if (nearestMesh == nullptr)
+							if (shadowingMesh == nullptr)
 							{
+								nearestT = HUGE_VALUE;
 								t = scene->getMeshes()[0]->intersect(shadowRay);
 								if (t > 0.0f && t < nearestT)
 								{
-									nearestT = t;
 									shadowingMesh = scene->getMeshes()[0];
 								}
 							}
@@ -266,12 +267,12 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 				{
 					shadowingMesh = scene->getAccelerationStructure()->intersect(shadowRay, nearestT);
 
-					if (nearestMesh == nullptr)
+					if (shadowingMesh == nullptr)
 					{
+						nearestT = HUGE_VALUE;
 						t = scene->getMeshes()[0]->intersect(shadowRay);
 						if (t > 0.0f && t < nearestT)
 						{
-							nearestT = t;
 							shadowingMesh = scene->getMeshes()[0];
 						}
 					}
@@ -808,7 +809,7 @@ int main(int argc, char* argv[])
     #ifdef __APPLE__
         std::string filename = std::string("ball.nff");
     #else
-       std::string filename = std::string("../../RayTracing/TurnerRayTracing/src/nffs/ball_depth.nff");
+       std::string filename = std::string("../../RayTracing/TurnerRayTracing/src/nffs/mount_low.nff");
     #endif
 	scene = loader.createScene(filename);
 	scene->getCamera()->calculate();

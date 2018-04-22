@@ -107,9 +107,10 @@ Mesh *Grid::intersect(Ray &ray, float &nearestT)
 	int index;
 	int ix = 0, iy = 0, iz = 0;
 
-	float t = BB->intersect(ray);
+	//float t = BB->intersect(ray);
+	Vector2 v = BB->intersectTwo(ray);
 
-	if (t > 0.0f)
+	if (v.x > 0.0f || v.y > 0.0f)
 	{
 		if ((ray.origin > p0) && (ray.origin < p1))
 		{
@@ -119,7 +120,7 @@ Mesh *Grid::intersect(Ray &ray, float &nearestT)
 		}
 		else
 		{
-			ray.intersectionPoint(t);
+			ray.intersectionPoint(v.x);
 
 			ix = clamp(((ray.point.x - p0.x) * (Nx / (p1.x - p0.x))), 0, (Nx - 1));
 			iy = clamp(((ray.point.y - p0.y) * (Ny / (p1.y - p0.y))), 0, (Ny - 1));
@@ -209,32 +210,13 @@ Mesh *Grid::intersect(Ray &ray, float &nearestT)
 		iz_step = -1; // just to initialize. Never used
 		iz_stop = -1;
 	}
-
-	//std::cout << tx_next << std::endl;
-	//std::cout << ty_next << std::endl;
-	//index = (ix + 1) + Nx * iy + Nx * Ny * iz;
-	//int index2 = ix + Nx * (iy + 1) + Nx * Ny * iz;
-	//
-	//	if (tx_next < ty_next && index < uniformGrid.size() - 2)
-	//	{
-	//		ix += 1;
-	//		tx_next += dtx;
-	//	}
-	//	else if(tx_next > ty_next && index2 < uniformGrid.size() - 2) {
-	//		iy += 1;
-	//		ty_next += dty;
-	//	}
 	
-	
-	
-	
-
 	while (true)
 	{
 		nearestT = HUGE_VALUE;
-		t = 0.0f;
+		float t = 0.0f;
 
-		index = ix + Nx * iy + Nx * Ny * iz;
+		index = ix + (Nx * iy) + (Nx * Ny * iz);
 		std::vector<Mesh*> *meshes = uniformGrid[index]->getMeshes();
 		for (std::vector<Mesh*>::iterator itMesh = meshes->begin(); itMesh != meshes->end(); ++itMesh)
 		{
