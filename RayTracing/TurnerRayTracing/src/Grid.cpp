@@ -111,7 +111,7 @@ Mesh *Grid::intersect(Ray &ray, float &nearestT)
 
 	if (t > 0.0f)
 	{
-		if ((ray.origin >= p0) && (ray.origin <= p1))
+		if ((ray.origin > p0) && (ray.origin < p1))
 		{
 			ix = clamp(((ray.origin.x - p0.x) * (Nx / (p1.x - p0.x))), 0, (Nx - 1));
 			iy = clamp(((ray.origin.y - p0.y) * (Ny / (p1.y - p0.y))), 0, (Ny - 1));
@@ -133,64 +133,101 @@ Mesh *Grid::intersect(Ray &ray, float &nearestT)
 		return nullptr;
 	}
 
+	float tminx = (p0.x - ray.origin.x) / ray.direction.x;
+	float tminy = (p0.y - ray.origin.y) / ray.direction.y;
+	float tminz = (p0.z - ray.origin.z) / ray.direction.z;
+
+	float tmaxx = (p1.x - ray.origin.x) / ray.direction.x;
+	float tmaxy = (p1.y - ray.origin.y) / ray.direction.y;
+	float tmaxz = (p1.z - ray.origin.z) / ray.direction.z;
+
+
+	if(tminx > tmaxx)
+		std::swap(tminx, tmaxx);
+	if (tminy > tmaxy)
+		std::swap(tminy, tmaxy);
+	if (tminz > tmaxz)
+		std::swap(tminz, tmaxz);
+
+
 	// ray parameter increments per cell in the x, y, and z directions
-	float dtx = (p1.x - p0.x) / Nx;
-	float dty = (p1.y - p0.y) / Ny;
-	float dtz = (p1.z - p0.z) / Nz;
+	float dtx = (tmaxx - tminx) / Nx;
+	float dty = (tmaxy - tminy) / Ny;
+	float dtz = (tmaxz - tminz) / Nz;
 	float tx_next, ty_next, tz_next;
 	int ix_step, iy_step, iz_step;
 	int ix_stop, iy_stop, iz_stop;
 
-	//A ray has direction (dx, dy). Possible cases for direction xx’:
-	//if (ray.direction.x > 0.0f) {
-	tx_next = p0.x + (ix + 1) * dtx;
-	ix_step = +1;
-	ix_stop = Nx;
-	//}
-	//else {
-	//	tx_next = p0.x + (Nx - ix) * dtx;
-	//	ix_step = -1;
-	//	ix_stop = -1;
-	//}
-	//if (ray.direction.x == 0.0f) {
-	//	tx_next = HUGE_VALUE; //WHY?
-	//	ix_step = -1; // just to initialize. Never used
-	//	ix_stop = -1;
-	//}
 
 	//A ray has direction (dx, dy). Possible cases for direction xx’:
-	//if (ray.direction.y > 0.0f) {
-	ty_next = p0.y + (iy + 1) * dty;
-	iy_step = +1;
-	iy_stop = Ny;
-	//}
-	//else {
-	//	ty_next = p0.y + (Ny - iy) * dty;
-	//	iy_step = -1;
-	//	iy_stop = -1;
-	//}
-	//if (ray.direction.y == 0.0f) {
-	//	ty_next = HUGE_VALUE; //WHY?
-	//	iy_step = -1; // just to initialize. Never used
-	//	iy_stop = -1;
-	//}
+	if (ray.direction.x > 0.0f) {
+		tx_next = tminx + (ix + 1) * dtx;
+		ix_step = 1;
+		ix_stop = Nx;
+	}
+	else {
+		tx_next = tminx + (Nx - ix) * dtx;
+		ix_step = -1;
+		ix_stop = -1;
+	}
+	if (ray.direction.x == 0.0f) {
+		tx_next = HUGE_VALUE; //WHY?
+		ix_step = -1; // just to initialize. Never used
+		ix_stop = -1;
+	}
 
 	//A ray has direction (dx, dy). Possible cases for direction xx’:
-	//if (ray.direction.z > 0.0f) {
-	tz_next = p0.z + (iz + 1) * dtz;
-	iz_step = +1;
-	iz_stop = Nz;
-	//}
-	//else {
-	//	tz_next = p0.z + (Nz - iz) * dtz;
-	//	iz_step = -1;
-	//	iz_stop = -1;
-	//}
-	//if (ray.direction.z == 0.0f) {
-	//	tz_next = HUGE_VALUE; //WHY?
-	//	iz_step = -1; // just to initialize. Never used
-	//	iz_stop = -1;
-	//}
+	if (ray.direction.y > 0.0f) {
+		ty_next = tminy + (iy + 1) * dty;
+		iy_step = 1;
+		iy_stop = Ny;
+	}
+	else {
+		ty_next = tminy + (Ny - iy) * dty;
+		iy_step = -1;
+		iy_stop = -1;
+	}
+	if (ray.direction.y == 0.0f) {
+		ty_next = HUGE_VALUE; //WHY?
+		iy_step = -1; // just to initialize. Never used
+		iy_stop = -1;
+	}
+
+	//A ray has direction (dx, dy). Possible cases for direction xx’:
+	if (ray.direction.z > 0.0f) {
+		tz_next = tminz + (iz + 1) * dtz;
+		iz_step = 1;
+		iz_stop = Nz;
+	}
+	else {
+		tz_next = tminz + (Nz - iz) * dtz;
+		iz_step = -1;
+		iz_stop = -1;
+	}
+	if (ray.direction.z == 0.0f) {
+		tz_next = HUGE_VALUE; //WHY?
+		iz_step = -1; // just to initialize. Never used
+		iz_stop = -1;
+	}
+
+	//std::cout << tx_next << std::endl;
+	//std::cout << ty_next << std::endl;
+	//index = (ix + 1) + Nx * iy + Nx * Ny * iz;
+	//int index2 = ix + Nx * (iy + 1) + Nx * Ny * iz;
+	//
+	//	if (tx_next < ty_next && index < uniformGrid.size() - 2)
+	//	{
+	//		ix += 1;
+	//		tx_next += dtx;
+	//	}
+	//	else if(tx_next > ty_next && index2 < uniformGrid.size() - 2) {
+	//		iy += 1;
+	//		ty_next += dty;
+	//	}
+	
+	
+	
+	
 
 	while (true)
 	{
@@ -213,17 +250,12 @@ Mesh *Grid::intersect(Ray &ray, float &nearestT)
 			}
 		}
 
-		if (nearestMesh != nullptr /*&& nearestT < tx_next && nearestT < ty_next && nearestT < tz_next*/)
-		{
-			return nearestMesh;
-		}
-
 		if (tx_next < ty_next && tx_next < tz_next)
 		{
-			//if (nearestMesh != nullptr || t < tx_next)
-			//{
-			//	return nearestMesh;
-			//}
+			if (nearestMesh != nullptr && nearestT < tx_next)
+			{
+				return nearestMesh;
+			}
 
 			tx_next += dtx;
 			ix += ix_step;
@@ -237,13 +269,13 @@ Mesh *Grid::intersect(Ray &ray, float &nearestT)
 		}
 		else
 		{
-			//if (nearestMesh != nullptr || t < ty_next)
-			//{
-			//	return nearestMesh;
-			//}
-
 			if (ty_next < tz_next)
 			{
+				if (nearestMesh != nullptr && nearestT < ty_next)
+				{
+					return nearestMesh;
+				}
+
 				ty_next += dty;
 				iy += iy_step;
 
@@ -256,10 +288,10 @@ Mesh *Grid::intersect(Ray &ray, float &nearestT)
 			}
 			else
 			{
-				//if (nearestMesh != nullptr || t < tz_next)
-				//{
-				//	return nearestMesh;
-				//}
+				if (nearestMesh != nullptr && nearestT < tz_next)
+				{
+					return nearestMesh;
+				}
 
 				tz_next += dtz;
 				iz += iz_step;
