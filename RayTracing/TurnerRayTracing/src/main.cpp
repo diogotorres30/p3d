@@ -26,7 +26,7 @@
 #define COLOR_ATTRIB 1
 
 #define MAX_DEPTH 6
-#define SAMPLE_NUMBER 16
+#define SAMPLE_NUMBER 4
 
 // Points defined by 2 attributes: positions which are stored in vertices array and colors which are stored in colors array
 float *colors;
@@ -72,7 +72,6 @@ int uniqueRayID()
 
 Mesh* iterateObjects(Ray ray, float &nearestT)
 {
-	//float nearestT = 100.0f;
 	float t = 0.0f;
 	Mesh *nearestMesh = nullptr;
 
@@ -131,20 +130,9 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 	Vector3 fixedPoint = Vector3(0.0f);
 	Vector3 reflected;
 
-	if (keyBuffer['G'] || keyBuffer['g'])
+	if ((scene->getAccelerationStructure() != nullptr))
 	{
 		nearestMesh = scene->getAccelerationStructure()->intersect(ray, nearestT);
-
-		if (nearestMesh == nullptr)
-		{
-			nearestT = HUGE_VALUE;
-			t = scene->getMeshes()[0]->intersect(ray);
-			if (t > 0.0f && t < nearestT)
-			{
-				nearestT = t;
-				nearestMesh = scene->getMeshes()[0];
-			}
-		}
 	}
 	else
 	{
@@ -198,19 +186,9 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 
 						//intersect with each object of the scene to check if it casts shadow
 						Mesh* shadowingMesh = nullptr;
-						if (keyBuffer['G'] || keyBuffer['g'])
+						if ((scene->getAccelerationStructure() != nullptr))
 						{
 							shadowingMesh = scene->getAccelerationStructure()->intersect(shadowRay, nearestT);
-
-							if (shadowingMesh == nullptr)
-							{
-								nearestT = HUGE_VALUE;
-								t = scene->getMeshes()[0]->intersect(shadowRay);
-								if (t > 0.0f && t < nearestT)
-								{
-									shadowingMesh = scene->getMeshes()[0];
-								}
-							}
 						}
 						else
 						{
@@ -263,19 +241,9 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 
 				//intersect with each object of the scene to check if it casts shadow
 				Mesh* shadowingMesh = nullptr;
-				if (keyBuffer['G'] || keyBuffer['g'])
+				if ((scene->getAccelerationStructure() != nullptr))
 				{
 					shadowingMesh = scene->getAccelerationStructure()->intersect(shadowRay, nearestT);
-
-					if (shadowingMesh == nullptr)
-					{
-						nearestT = HUGE_VALUE;
-						t = scene->getMeshes()[0]->intersect(shadowRay);
-						if (t > 0.0f && t < nearestT)
-						{
-							shadowingMesh = scene->getMeshes()[0];
-						}
-					}
 				}
 				else
 				{
@@ -535,6 +503,10 @@ void renderScene()
 	if ((keyBuffer['G'] || keyBuffer['g']) && (scene->getAccelerationStructure() == nullptr))
 	{
 		scene->createAccelerationStructure();
+	}
+	else
+	{
+		scene->setAccelerationStructure(nullptr);
 	}
 
     for (int y = 0; y < RES_Y; y++)
@@ -809,7 +781,7 @@ int main(int argc, char* argv[])
     #ifdef __APPLE__
         std::string filename = std::string("ball.nff");
     #else
-       std::string filename = std::string("../../RayTracing/TurnerRayTracing/src/nffs/mount_low.nff");
+       std::string filename = std::string("../../RayTracing/TurnerRayTracing/src/nffs/mount_high.nff");
     #endif
 	scene = loader.createScene(filename);
 	scene->getCamera()->calculate();

@@ -40,8 +40,6 @@ float Triangle::intersect(Ray &ray) {
 	}
 	else
 	{
-
-		//std::cout << p1 << std::endl;
 		const float epsilon = 0.0000001;
 		Vector3 edge1, edge2, h, s, q;
 		float t = -1.0;

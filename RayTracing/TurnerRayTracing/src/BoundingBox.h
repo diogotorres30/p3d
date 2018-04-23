@@ -27,7 +27,6 @@ class BoundingBox
         BoundingBox();
         BoundingBox(float minX, float maxX, float minY, float maxY, float minZ, float maxZ);
         float intersect(Ray &ray);
-		Vector2 intersectTwo(Ray &ray);
 		float getXMin() { return xMin; };
 		float getXMax() { return xMax; };
 		float getYMin() { return yMin; };

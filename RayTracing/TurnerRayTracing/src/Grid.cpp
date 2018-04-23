@@ -38,7 +38,7 @@ Grid::Grid(std::vector<Mesh*> meshes)
 	BB = new BoundingBox(pMin.x, pMax.x, pMin.y, pMax.y, pMin.z, pMax.z);
 
 	//the size except for the plane
-	int N = meshes.size() - 1;
+	int N = meshes.size();
 
 	//multiplying factor
 	int m = 2;
@@ -98,6 +98,10 @@ Grid::Grid(std::vector<Mesh*> meshes)
 				}
 			}
 		}
+		else
+		{
+
+		}
 	}
 }
 
@@ -107,10 +111,10 @@ Mesh *Grid::intersect(Ray &ray, float &nearestT)
 	int index;
 	int ix = 0, iy = 0, iz = 0;
 
-	//float t = BB->intersect(ray);
-	Vector2 v = BB->intersectTwo(ray);
+	float t = BB->intersect(ray);
+	//Vector2 v = BB->intersectTwo(ray);
 
-	if (v.x > 0.0f || v.y > 0.0f)
+	if (t > 0.0f)
 	{
 		if ((ray.origin > p0) && (ray.origin < p1))
 		{
@@ -120,7 +124,7 @@ Mesh *Grid::intersect(Ray &ray, float &nearestT)
 		}
 		else
 		{
-			ray.intersectionPoint(v.x);
+			ray.intersectionPoint(t);
 
 			ix = clamp(((ray.point.x - p0.x) * (Nx / (p1.x - p0.x))), 0, (Nx - 1));
 			iy = clamp(((ray.point.y - p0.y) * (Ny / (p1.y - p0.y))), 0, (Ny - 1));
@@ -214,7 +218,7 @@ Mesh *Grid::intersect(Ray &ray, float &nearestT)
 	while (true)
 	{
 		nearestT = HUGE_VALUE;
-		float t = 0.0f;
+		t = 0.0f;
 
 		index = ix + (Nx * iy) + (Nx * Ny * iz);
 		std::vector<Mesh*> *meshes = uniformGrid[index]->getMeshes();
