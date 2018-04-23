@@ -112,7 +112,6 @@ Mesh *Grid::intersect(Ray &ray, float &nearestT)
 	int ix = 0, iy = 0, iz = 0;
 
 	float t = BB->intersect(ray);
-	//Vector2 v = BB->intersectTwo(ray);
 
 	if (t > 0.0f)
 	{

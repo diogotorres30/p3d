@@ -150,7 +150,7 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 		ray.intersectionPoint(nearestT);
 
 		//Ambient component
-		color = /*nearestMesh->getMaterial()->getColor() * nearestMesh->getMaterial()->getKd()*/Color(0.0f, 0.0f, 0.0f);
+		color = Color(0.0f, 0.0f, 0.0f);
 		Vector3 normal = normalized(nearestMesh->getNormal(ray));
 
 		float epsilonOne, epsilonTwo;
