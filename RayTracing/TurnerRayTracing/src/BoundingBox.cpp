@@ -63,14 +63,14 @@ float BoundingBox::intersect(Ray &ray){
         t1 = tz_min;
     }
     
-    if(tx_max > ty_max){
+    if(tx_max < ty_max){
         t1 = tx_max;
     }
     else{
         t1 = ty_max;
     }
     
-    if(tz_max > t0){
+    if(tz_max < t0){
         t1 = tz_max;
     }
     
@@ -134,14 +134,14 @@ Vector2 BoundingBox::intersectTwo(Ray &ray) {
 		t1 = tz_min;
 	}
 
-	if (tx_max > ty_max) {
+	if (tx_max < ty_max) {
 		t1 = tx_max;
 	}
 	else {
 		t1 = ty_max;
 	}
 
-	if (tz_max > t0) {
+	if (tz_max < t0) {
 		t1 = tz_max;
 	}
 
