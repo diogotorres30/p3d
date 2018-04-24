@@ -516,32 +516,32 @@ void renderScene()
 			//Anti-aliasing mode
 			if (keyBuffer['A'] || keyBuffer['a'])
 			{
-				for (int p = 0; p < SAMPLE_NUMBER; p++)
+				//with depth of field
+				if (keyBuffer['D'] || keyBuffer['d'])
 				{
-					//with depth of field
-					if (keyBuffer['D'] || keyBuffer['d'])
+					for (int p = 0; p < SAMPLE_NUMBER; p++)
 					{
-						float radius = sqrt(dis(gen));
-						float theta = dis(gen) * 2 * PI;
-
-						//Point in the lens in camera coordinates
-						ls.x = scene->getCamera()->getWidth() * ((radius * cos(theta)) / scene->getCamera()->getResX()) * aperture;
-						ls.y = scene->getCamera()->getHeight() * ((radius * sin(theta)) / scene->getCamera()->getResY()) * aperture;
-						ls.z = 0.0f;
-
-						//Point in the lens in world coordinates
-						Vector3 origX = ls.x * scene->getCamera()->getXe();
-						Vector3 origY = ls.y  * scene->getCamera()->getYe();
-						Vector3 origZ = 0.0f;
-
-						Vector3 orig = origX + origY + origZ;
-						orig += scene->getCamera()->getFrom();
-
 						for (int q = 0; q < SAMPLE_NUMBER; q++)
 						{
+							float radius = sqrt(dis(gen));
+							float theta = dis(gen) * 2 * PI;
+
+							//Point in the lens in camera coordinates
+							ls.x = scene->getCamera()->getWidth() * ((radius * cos(theta)) / scene->getCamera()->getResX()) * aperture;
+							ls.y = scene->getCamera()->getHeight() * ((radius * sin(theta)) / scene->getCamera()->getResY()) * aperture;
+							ls.z = 0.0f;
+
+							//Point in the lens in world coordinates
+							Vector3 origX = ls.x * scene->getCamera()->getXe();
+							Vector3 origY = ls.y  * scene->getCamera()->getYe();
+							Vector3 origZ = 0.0f;
+
+							Vector3 orig = origX + origY + origZ;
+							orig += scene->getCamera()->getFrom();
+
 							epsilon = dis(gen);
-							float randomX = x + (p + epsilon) / SAMPLE_NUMBER;
-							float randomY = y + (q + epsilon) / SAMPLE_NUMBER;
+							float randomX = x + ((p + epsilon) / SAMPLE_NUMBER);
+							float randomY = y + ((q + epsilon) / SAMPLE_NUMBER);
 
 							//Pixel in the view plane, in camera coordinates
 							ps.x = scene->getCamera()->getWidth() * (((randomX + 0.5f) / scene->getCamera()->getResX()) - 0.5f);
@@ -563,13 +563,16 @@ void renderScene()
 							color += rayTracing(ray, 1, 1.0f);
 						}
 					}
-					else
+				}
+				else
+				{
+					for (int p = 0; p < SAMPLE_NUMBER; p++)
 					{
 						for (int q = 0; q < SAMPLE_NUMBER; q++)
 						{
 							epsilon = dis(gen);
-							float randomX = x + (p + epsilon) / SAMPLE_NUMBER;
-							float randomY = y + (q + epsilon) / SAMPLE_NUMBER;
+							float randomX = x + ((p + epsilon) / SAMPLE_NUMBER);
+							float randomY = y + ((q + epsilon) / SAMPLE_NUMBER);
 							ray = Ray(scene->getCamera(), Vector2(randomX, randomY), uniqueRayID());
 
 							color += rayTracing(ray, 1, 1.0f);
@@ -581,7 +584,7 @@ void renderScene()
 			//Depth of Field mode
 			else if (keyBuffer['D'] || keyBuffer['d'])
 			{
-				for (int i = 0; i < SAMPLE_NUMBER; i++)
+				for (int i = 0; i < SAMPLE_NUMBER * SAMPLE_NUMBER; i++)
 				{
 					float radius = sqrt(dis(gen));
 					float theta = dis(gen) * 2 * PI;
@@ -618,7 +621,7 @@ void renderScene()
 
 					color += rayTracing(ray, 1, 1.0f);
 				}
-				color /= SAMPLE_NUMBER;
+				color /= SAMPLE_NUMBER * SAMPLE_NUMBER;
 			}
 			else
 			{
@@ -781,7 +784,7 @@ int main(int argc, char* argv[])
     #ifdef __APPLE__
         std::string filename = std::string("ball.nff");
     #else
-       std::string filename = std::string("../../RayTracing/TurnerRayTracing/src/nffs/complex.nff");
+       std::string filename = std::string("../../RayTracing/TurnerRayTracing/src/nffs/mount_low.nff");
     #endif
 	scene = loader.createScene(filename);
 	scene->getCamera()->calculate();
