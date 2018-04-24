@@ -500,7 +500,7 @@ void renderScene()
 	Vector3 ps = Vector3();
 	Vector3	ls = Vector3();
 
-	if ((keyBuffer['G'] || keyBuffer['g']) && (scene->getAccelerationStructure() == nullptr))
+	if (!(keyBuffer['G'] || keyBuffer['g']) && (scene->getAccelerationStructure() == nullptr))
 	{
 		scene->createAccelerationStructure();
 	}
@@ -781,7 +781,7 @@ int main(int argc, char* argv[])
     #ifdef __APPLE__
         std::string filename = std::string("ball.nff");
     #else
-       std::string filename = std::string("../../RayTracing/TurnerRayTracing/src/nffs/mount_high.nff");
+       std::string filename = std::string("../../RayTracing/TurnerRayTracing/src/nffs/complex.nff");
     #endif
 	scene = loader.createScene(filename);
 	scene->getCamera()->calculate();
